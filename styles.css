@@ -1,0 +1,128 @@
+:root {
+  --color-background: white;
+  --color-primary: #0076BC;
+  --color-primary-lighten: #f4f1fa;
+  --color-secondary: #fafafa;
+  --color-border: #ebebeb;
+  --color-text: #4a4a4a;
+  --color-text-lighten: #7a7a7a;
+}
+
+* {
+  box-sizing: border-box;
+  scrollbar-width: none;
+}
+
+body {
+  background: var(--color-primary);
+  color: var(--color-text);
+  direction: ltr;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.5rem;
+  margin: 0;
+  overflow: hidden;
+}
+
+.body__popup {
+  width: 800px;
+}
+
+a,
+a:focus,
+a:hover {
+  color: var(--color-primary);
+  outline: none;
+  text-decoration: underline;
+}
+
+p {
+  margin: 0 0 0.5rem 0;
+}
+
+table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.popup {
+  background: var(--color-background);
+  max-height: 34rem;
+  overflow-y: auto;
+}
+
+h1 {
+  color: var(--color-primary-lighten);
+}
+
+.header {
+  align-items: center;
+  background: var(--color-primary);
+  display: flex;
+  height: 4.5rem;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+}
+
+.spacer {
+  flex-grow: 1;
+}
+
+.tabs {
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background);
+  display: flex;
+  font-size: 0.8rem;
+}
+
+.tab {
+  color: var(--color-text-lighten);
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  padding: 1rem 1.5rem 0.8rem 1.5rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+  position: relative;
+}
+
+.tab:hover {
+  background: var(--color-secondary);
+}
+
+.tab--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.tab--active {
+  background: var(--color-primary-lighten);
+  border-bottom: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  pointer-events: none;
+}
+
+.tab-item {
+  background: var(--color-background);
+  overflow: hidden;
+  padding: 1rem 1.5rem 0 1.5rem;
+}
+
+.tab-item:nth-child(2) {
+  width: 31rem;
+}
+
+.tab-item--hidden {
+  display: none;
+}
+
+.notification-table td {
+  padding: 0.25rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.notification-table a {
+  text-decoration: none;
+  cursor: pointer;
+}

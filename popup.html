@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Notifications</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="popup.js" type="module"></script>
+  </head>
+  <body class="body__popup">
+    <div class="popup">
+      <div class="header">
+        <h1>Neutilities</h1>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab tab--notification tab--active">Thống báo</div>
+      <div class="tab tab--plus"><span>Chức năng khác</span></div>
+    </div>
+
+    <div class="tab-items">
+      <div class="tab-item">
+        <table class="notification-table"></table>
+      </div>
+
+      <div class="tab-item tab-item--hidden"></div>
+    </div>
+
+    <!-- #region list item template -->
+
+    <template id="notification-item-template">
+      <tr>
+        <td><a class="notification-item"></a></td>
+        <td><span class="notification-date"></span></td>
+      </tr>
+      <li>
+        <a class="notification-item"></a>
+      </li>
+    </template>
+
+    <!-- #endregion -->
+  </body>
+</html>
