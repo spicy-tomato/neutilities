@@ -59,8 +59,6 @@ export class NotificationFetcher {
           new NeuNotification(aTag.innerText, aTag.attributes.href.value, date)
         );
       }
-
-      console.log(this.#notifications);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     }
@@ -68,7 +66,7 @@ export class NotificationFetcher {
 
   /**
    * Display to popup
-   * @returns
+   * @returns {void}
    */
   display() {
     /** @type {HTMLElement} */
