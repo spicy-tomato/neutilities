@@ -1,3 +1,4 @@
+import { ExtBadge } from './shared/badge.js';
 import {
   FETCH_NOTIFICATION_ALARM,
   FETCH_NOTIFICATION_PERIOD,
@@ -31,5 +32,10 @@ async function handleFetchNotificationJob() {
     'offscreen',
     {}
   );
-  await ExtStorage.setLatestNotification(latestNotificationUrl);
+
+  const cachedLatestNotification = await ExtStorage.getLatestNotification();
+
+  if (latestNotificationUrl != cachedLatestNotification) {
+    await ExtBadge.setText('new');
+  }
 }

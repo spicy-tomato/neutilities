@@ -1,4 +1,5 @@
 import { NotificationFetcher } from './functions/fetch-notification.js';
+import { ExtBadge } from './shared/badge.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const fetcher = new NotificationFetcher();
@@ -6,4 +7,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   await fetcher.fetch();
   fetcher.display();
   await fetcher.cache();
+
+  await ExtBadge.clear();
 });

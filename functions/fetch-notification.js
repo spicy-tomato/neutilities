@@ -20,7 +20,7 @@ export class NotificationFetcher {
   #notifications = [];
 
   get latestNotificationUrl() {
-    return this.#notifications?.[0].href;
+    return this.#notifications[0]?.href;
   }
 
   /**
