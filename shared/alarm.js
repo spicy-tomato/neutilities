@@ -17,11 +17,12 @@ export class ExtAlarm {
   listen() {
     chrome.alarms.onAlarm.addListener((alarm) => {
       const handler = this.#alarmsHandler.get(alarm.name);
-      if (handler) {
-        handler();
-      } else {
+      if (!handler) {
         console.warn('No handler for alarm', alarm.name);
+        return;
       }
+
+      handler();
     });
   }
 }

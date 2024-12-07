@@ -1,5 +1,6 @@
 import { SCHOOL_SITE } from '../shared/const.js';
 import { ExtStorage } from '../shared/storage.js';
+import { ExtTab } from '../shared/tab.js';
 
 class NeuNotification {
   /**
@@ -81,10 +82,8 @@ export class NotificationFetcher {
       domItemLink.textContent = notification.title;
       domItemDate.textContent = notification.date;
 
-      domItemLink.addEventListener('click', () => {
-        chrome.tabs.create({
-          url: SCHOOL_SITE + notification.href,
-        });
+      domItemLink.addEventListener('click', async () => {
+        await ExtTab.create('SCHOOL_SITE', notification.href);
       });
 
       elements.push(element);
