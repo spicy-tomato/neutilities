@@ -3,8 +3,6 @@
 import { NotificationFetcher } from './functions/fetch-notification.js';
 import { ExtMessage } from './shared/message.js';
 
-ExtMessage.listenOnTarget('offscreen', handleMessages, true);
-
 /**
  *
  * @param {import('./shared/message.js').MessageModel} message
@@ -38,3 +36,7 @@ async function fetchNotification(sendResponse) {
   await fetcher.fetch();
   sendResponse(fetcher.latestNotificationUrl);
 }
+
+//////////////////////////////////////////////////
+
+ExtMessage.listenOnTarget('offscreen', handleMessages, true);

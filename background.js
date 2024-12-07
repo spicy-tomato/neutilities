@@ -1,26 +1,7 @@
+import { ExtAlarm } from './shared/alarm.js';
 import { ExtBadge } from './shared/badge.js';
-import {
-  FETCH_NOTIFICATION_ALARM,
-  FETCH_NOTIFICATION_PERIOD,
-} from './shared/const.js';
 import { ExtMessage } from './shared/message.js';
 import { ExtStorage } from './shared/storage.js';
-
-chrome.offscreen.createDocument({
-  url: chrome.runtime.getURL('offscreen.html'),
-  reasons: [chrome.offscreen.Reason.DOM_PARSER],
-  justification: 'Fetching notification from NEU homepage site',
-});
-
-chrome.alarms.create(FETCH_NOTIFICATION_ALARM, {
-  periodInMinutes: FETCH_NOTIFICATION_PERIOD,
-});
-
-chrome.alarms.onAlarm.addListener(async (alarm) => {
-  if (alarm.name === FETCH_NOTIFICATION_ALARM) {
-    await handleFetchNotificationJob();
-  }
-});
 
 /**
  * @returns {Promise.<void>}
@@ -39,3 +20,21 @@ async function handleFetchNotificationJob() {
     await ExtBadge.setText('new');
   }
 }
+
+//////////////////////////////////////////////////
+
+chrome.offscreen.createDocument({
+  url: chrome.runtime.getURL('offscreen.html'),
+  reasons: [chrome.offscreen.Reason.DOM_PARSER],
+  justification: 'Fetching notification from NEU homepage site',
+});
+
+const alarm = new ExtAlarm();
+
+alarm.add(
+  'FETCH_NOTIFICATION_ALARM',
+  { periodInMinutes: 0.5 },
+  handleFetchNotificationJob
+);
+
+alarm.listen();
