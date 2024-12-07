@@ -2,6 +2,7 @@ import { ExtAlarm } from './shared/alarm.js';
 import { ExtBadge } from './shared/badge.js';
 import { ExtMessage } from './shared/message.js';
 import { ExtStorage } from './shared/storage.js';
+import { ExtOffscreen } from './shared/offscreen.js';
 
 /**
  * @returns {Promise.<void>}
@@ -23,11 +24,11 @@ async function handleFetchNotificationJob() {
 
 //////////////////////////////////////////////////
 
-chrome.offscreen.createDocument({
-  url: chrome.runtime.getURL('offscreen.html'),
-  reasons: [chrome.offscreen.Reason.DOM_PARSER],
-  justification: 'Fetching notification from NEU homepage site',
-});
+ExtOffscreen.createDocument(
+  'offscreen.html',
+  chrome.offscreen.Reason.DOM_PARSER,
+  'Fetching notifications from NEU homepage site'
+);
 
 const alarm = new ExtAlarm();
 
