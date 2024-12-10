@@ -1,0 +1,34 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          release-type: simple
+
+  publish:
+    name: Publish extension
+    runs-on: ubuntu-latest
+    needs: release
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compress
+        run: zip -r neutilities.zip .
+
+      - name: Upload & release
+        uses: mnao305/chrome-extension-upload@v5.0.0
+        with:
+          file-path: neutilities.zip
+          extension-id: ${{ secrets.EXTENSION_ID }}
+          client-id: ${{ secrets.CLIENT_ID }}
+          client-secret: ${{ secrets.CLIENT_SECRET }}
+          refresh-token: ${{ secrets.REFRESH_TOKEN }}
