@@ -1,0 +1,25 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Release new version
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Config git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions-bot@users.noreply.github.com"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Release new version
+        run: npx -y commit-and-tag-version --bumpFiles manifest.json
+
+      - name: Push new version
+        run: |
+          git push --follow-tags origin master
