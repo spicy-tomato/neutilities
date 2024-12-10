@@ -17,7 +17,7 @@ export class ExtStorage {
    * @returns {Promise.<string | undefined>}
    */
   static async getLatestNotification() {
-    return (await chrome.storage.sync.get('latestNotification'))?.[
+    return (await chrome.storage.sync.get(this.#latestNotificationKey))?.[
       this.#latestNotificationKey
     ];
   }
