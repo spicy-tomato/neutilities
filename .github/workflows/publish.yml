@@ -13,7 +13,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Compress
-        run: zip -r neutilities.zip .
+        run: |
+          zip -r neutilities.zip . -x ".git**" -x ".vscode**" -x ".prettier*" -x "*.md" -x "LICENSE" &&
+          du -s --block-size=k neutilities.zip
 
       - name: Upload & release
         uses: mnao305/chrome-extension-upload@v5.0.0
