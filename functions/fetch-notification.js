@@ -2,7 +2,7 @@ import { SCHOOL_SITE } from '../shared/const.js';
 import { ExtStorage } from '../shared/storage.js';
 import { ExtTab } from '../shared/tab.js';
 
-class NeuNotification {
+export class NeuNotification {
   /**
    * Constructor
    * @param {string} title Title of notification
@@ -100,7 +100,6 @@ export class NotificationFetcher {
       return;
     }
 
-    const latestNotification = this.#notifications[0];
-    ExtStorage.setLatestNotification(latestNotification.href);
+    ExtStorage.setPostsLinkConcatenation(this.#notifications);
   }
 }
