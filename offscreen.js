@@ -1,5 +1,3 @@
-/// <reference path="shared/message.js" />
-
 import { NotificationFetcher } from './functions/fetch-notification.js';
 import { ExtMessage } from './shared/message.js';
 
