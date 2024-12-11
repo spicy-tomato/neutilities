@@ -5,14 +5,18 @@ import { ExtTab } from '../shared/tab.js';
 export class NeuNotification {
   /**
    * Constructor
+   * @param {string} idx Index of notification
    * @param {string} title Title of notification
    * @param {string} href URL of notification
    * @param {string} date published date of notification
+   * @param {string} isoDate published date of notification in ISO format
    */
-  constructor(title, href, date) {
+  constructor(idx, title, href, date, isoDate) {
+    this.idx = idx;
     this.title = title;
     this.href = href;
     this.date = date;
+    this.isoDate = isoDate;
   }
 }
 
@@ -49,16 +53,26 @@ export class NotificationFetcher {
       }
 
       this.#notifications = [];
+      let idx = 0;
 
       for (const notificationElement of domNotificationElements) {
         const aTag = notificationElement.querySelector('a');
         const iTag = notificationElement.querySelector('i');
 
-        const date = iTag.innerText.match(/\d{2}\/\d{2}\/\d{4}/)?.[0] ?? '';
+        const dateStr = iTag.innerText.match(/\d{2}\/\d{2}\/\d{4}/)?.[0] ?? '';
+        const dateStrIso = dateStr.split('/').reverse().join('-');
 
         this.#notifications.push(
-          new NeuNotification(aTag.innerText, aTag.attributes.href.value, date)
+          new NeuNotification(
+            idx,
+            aTag.innerText,
+            aTag.attributes.href.value,
+            dateStr,
+            dateStrIso
+          )
         );
+
+        idx++;
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -101,5 +115,14 @@ export class NotificationFetcher {
     }
 
     ExtStorage.setPostsLinkConcatenation(this.#notifications);
+  }
+
+  sort() {
+    this.#notifications.sort((a, b) => {
+      if (a.isoDate !== b.isoDate) {
+        return new Date(b.isoDate) - new Date(a.isoDate);
+      }
+      return a.idx - b.idx;
+    });
   }
 }
