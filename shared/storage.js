@@ -2,6 +2,14 @@ export class ExtStorage {
   static #postsLinkConcatenationKey = 'postsLinkConcatenation';
 
   /**
+   * Clear storage
+   * @returns {Promise.<string | undefined>}
+   */
+  static async clear() {
+    await chrome.storage.sync.clear();
+  }
+
+  /**
    * Save latest notification's url concatenation
    * @param {Array.<import('../functions/fetch-notification').NeuNotification>} notifications
    * @returns {Promise.<void>}

@@ -38,3 +38,14 @@ alarm.add(
 );
 
 alarm.listen();
+
+chrome.runtime.onInstalled.addListener(async (details) => {
+  if (details.reason !== 'install') {
+    await ExtStorage.clear();
+  }
+  try {
+    await handleFetchNotificationJob();
+  } catch (_) {
+    setTimeout(handleFetchNotificationJob, 5000);
+  }
+});
