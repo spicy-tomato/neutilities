@@ -7,10 +7,16 @@ export class ExtOffscreen {
    * @returns {Promise.<void>}
    */
   static async createDocument(url, reason, justification) {
-    await chrome.offscreen.createDocument({
-      url: chrome.runtime.getURL(url),
-      reasons: [reason],
-      justification,
-    });
+    try {
+      await chrome.offscreen.createDocument({
+        url: chrome.runtime.getURL(url),
+        reasons: [reason],
+        justification,
+      });
+    } catch (error) {
+      if (!error.message?.startsWith("Only a single offscreen")) {
+        throw error;
+      }
+    }
   }
 }
