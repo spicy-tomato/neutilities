@@ -1,7 +1,5 @@
 {
   "typeAcquisition": {
-    "include": [
-      "chrome"
-    ]
+    "include": ["chrome"]
   }
 }
