@@ -33,7 +33,7 @@ const alarm = new ExtAlarm();
 
 alarm.add(
   'FETCH_NOTIFICATION_ALARM',
-  { periodInMinutes: 0.5 },
+  { periodInMinutes: 5 },
   handleFetchNotificationJob
 );
 
