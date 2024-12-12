@@ -131,6 +131,16 @@ h1 {
   cursor: pointer;
 }
 
+.tag {
+  padding: 2px 4px;
+  border-radius: 5px;
+  background-color: red;
+  font-size: 10px;
+  color: white;
+  text-align: center;
+  vertical-align: top;
+}
+
 .pin-btn {
   cursor: pointer;
 }

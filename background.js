@@ -1,26 +1,24 @@
+import { NotificationFetcher } from './functions/fetch-notification.js';
 import { ExtAlarm } from './shared/alarm.js';
 import { ExtBadge } from './shared/badge.js';
 import { ExtMessage } from './shared/message.js';
-import { ExtStorage } from './shared/storage.js';
 import { ExtOffscreen } from './shared/offscreen.js';
+import { ExtStorage } from './shared/storage.js';
 
 /**
  * @returns {Promise.<void>}
  */
 async function handleFetchNotificationJob() {
-  /** @type string */
-  const latestNotificationUrl = await ExtMessage.send(
+  const notifications = await ExtMessage.send(
     'FETCH_NOTIFICATION',
     'offscreen',
     {}
   );
 
-  if (!latestNotificationUrl) {
-    return;
-  }
+  const newNotifications =
+    await NotificationFetcher.getNewNotifications(notifications);
 
-  const notificationsListCache = await ExtStorage.getNotificationsListCache();
-  if (!notificationsListCache?.includes(latestNotificationUrl)) {
+  if (newNotifications.length > 0) {
     await ExtBadge.setText('new');
   }
 }

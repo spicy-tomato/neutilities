@@ -25,10 +25,18 @@ const MessageTargetValues = {
 export class ExtMessage {
   /**
    * Send message via Chrome Message API
+   *
+   * @overload
    * @param {MessageType} type
    * @param {MessageTarget} target
    * @param {*} data
    * @returns {Promise.<*>}
+   */ /**
+   * @overload
+   * @param {'FETCH_NOTIFICATION'} type
+   * @param {MessageTarget} target
+   * @param {*} data
+   * @returns {Promise.<Array<string>>}
    */
   static async send(type, target, data) {
     return chrome.runtime.sendMessage({

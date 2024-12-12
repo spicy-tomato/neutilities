@@ -18,6 +18,7 @@ export class NeuNotification {
     this.isPinned = isPinned;
     this.date = dateStr.match(/\d{2}\/\d{2}\/\d{4}/)?.[0] ?? '';
     this.isoDate = this.date.split('/').reverse().join('-');
+    this.isNew = false;
   }
 }
 
@@ -25,19 +26,55 @@ export class NotificationFetcher {
   /** @type {Array.<NeuNotification>} */
   #notifications = [];
 
-  get latestNotificationUrl() {
-    return this.#notifications[0]?.href;
+  get notifications() {
+    return this.#notifications[Symbol.iterator]();
+  }
+
+  /**
+   *
+   * @param {Array.<string>} notifications
+   * @returns {Promise.<Array<string>>}
+   */
+  static async getNewNotifications(notifications) {
+    /** @type {Array.<string>} */
+    const result = [];
+    let endIdx = notifications.length - 1;
+
+    const cachedNotifications = await ExtStorage.getNotificationsListCache();
+
+    for (; endIdx >= 0; endIdx--) {
+      if (cachedNotifications.includes(notifications[endIdx])) {
+        break;
+      }
+    }
+
+    // In case all notifications are not cached
+    if (endIdx <= 0) {
+      result.push(...notifications);
+    } else {
+      for (let i = 0; i < endIdx; i++) {
+        const notification = notifications[i];
+        if (!cachedNotifications.includes(notification)) {
+          result.push(notification);
+        }
+      }
+    }
+
+    return result;
   }
 
   /**
    * Fetch all notifications from homepage site
+   * @param {boolean} isRunFromBackground
    * @returns {Promise.<void>}
    */
-  async fetch() {
+  async fetch(isRunFromBackground = false) {
     try {
       const domNotificationElements = await this.#retrieveNotificationsDom();
-      const pinnedNotificationUrls =
-        await ExtStorage.getPinnedNotificationUrls();
+      /** @type {Set.<string>} */
+      const pinnedNotificationUrls = isRunFromBackground
+        ? new Set()
+        : await ExtStorage.getPinnedNotificationUrls();
 
       this.#notifications = [];
       let idx = 0;
@@ -54,7 +91,7 @@ export class NotificationFetcher {
         this.#notifications.push(
           new NeuNotification(
             idx,
-            aTag.innerText,
+            aTag.innerText.trim(),
             url,
             iTag.innerText,
             isPinned
@@ -69,22 +106,35 @@ export class NotificationFetcher {
   }
 
   /**
-   * Fetch all notifications from homepage site
-   * @returns {Promise.<string | undefined>}
+   * Sort notifications order by descending date
    */
-  async fetchLatestUrl() {
-    try {
-      const domNotificationElements = await this.#retrieveNotificationsDom();
-      if (domNotificationElements.length > 0) {
-        const firstNotificationElement = domNotificationElements.item(0);
-        const aTag = firstNotificationElement.querySelector('a');
-        const url = aTag.attributes['href'].value;
-        return url;
+  sort() {
+    this.#notifications.sort((a, b) => {
+      if (a.isPinned && !b.isPinned) {
+        return -1;
       }
-      return undefined;
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-    }
+      if (!a.isPinned && b.isPinned) {
+        return 1;
+      }
+      if (a.isoDate !== b.isoDate) {
+        return new Date(b.isoDate).getTime() - new Date(a.isoDate).getTime();
+      }
+      return a.idx - b.idx;
+    });
+  }
+
+  /**
+   * Sort notifications order by descending date
+   */
+  async markAsNew() {
+    const newNotifications = await NotificationFetcher.getNewNotifications(
+      this.#notifications.map((n) => n.href)
+    );
+    this.#notifications.forEach((n) => {
+      if (newNotifications.includes(n.href)) {
+        n.isNew = true;
+      }
+    });
   }
 
   /**
@@ -105,6 +155,8 @@ export class NotificationFetcher {
       /** @type {HTMLAnchorElement} */
       const domItemLink = element.querySelector('.notification-item');
       /** @type {HTMLSpanElement} */
+      const domTag = element.querySelector('.tag');
+      /** @type {HTMLSpanElement} */
       const domItemDate = element.querySelector('.notification-date');
       /** @type {SVGElement} */
       const unpinnedBtn = element.querySelector('.pin-btn.unpinned');
@@ -120,6 +172,10 @@ export class NotificationFetcher {
         pinnedBtn.classList.remove('hidden');
       }
 
+      if (notification.isNew) {
+        domTag.classList.remove('hidden');
+      }
+
       // Add event triggers
       domItemLink.addEventListener('click', async () => {
         await ExtTab.create('SCHOOL_SITE', notification.href);
@@ -131,7 +187,7 @@ export class NotificationFetcher {
         pinnedBtn.classList.remove('hidden');
         await ExtStorage.addPinnedNotification(notification.href);
         notification.isPinned = true;
-        await this.sort();
+        this.sort();
         this.display();
       });
 
@@ -141,7 +197,7 @@ export class NotificationFetcher {
         unpinnedBtn.classList.remove('hidden');
         await ExtStorage.removePinnedNotification(notification.href);
         notification.isPinned = false;
-        await this.sort();
+        this.sort();
         this.display();
       });
 
@@ -163,25 +219,9 @@ export class NotificationFetcher {
       return;
     }
 
-    await ExtStorage.setNotificationsListCache(this.#notifications);
-  }
-
-  /**
-   * Sort notifications order by descending date
-   */
-  async sort() {
-    this.#notifications.sort((a, b) => {
-      if (a.isPinned && !b.isPinned) {
-        return -1;
-      }
-      if (!a.isPinned && b.isPinned) {
-        return 1;
-      }
-      if (a.isoDate !== b.isoDate) {
-        return new Date(b.isoDate).getTime() - new Date(a.isoDate).getTime();
-      }
-      return a.idx - b.idx;
-    });
+    await ExtStorage.setNotificationsListCache(
+      this.#notifications.map((n) => n.href)
+    );
   }
 
   /**

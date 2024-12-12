@@ -16,20 +16,19 @@ export class ExtStorage {
 
   /**
    * Get notifications' url concatenation
-   * @returns {Promise.<string | undefined>}
+   * @returns {Promise.<Array<string>>}
    */
   static async getNotificationsListCache() {
-    return await this.#get(this.#notificationsListKey);
+    return (await this.#get(this.#notificationsListKey)) ?? [];
   }
 
   /**
    * Save notifications' url concatenation
-   * @param {Array.<import('../functions/fetch-notification').NeuNotification>} notifications
+   * @param {Array.<string>} notificationUrls
    * @returns {Promise.<void>}
    */
-  static async setNotificationsListCache(notifications) {
-    const concatenation = notifications.map((n) => n.href).join('');
-    await this.#set(this.#notificationsListKey, concatenation);
+  static async setNotificationsListCache(notificationUrls) {
+    await this.#set(this.#notificationsListKey, notificationUrls);
   }
 
   /**
