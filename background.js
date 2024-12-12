@@ -15,6 +15,10 @@ async function handleFetchNotificationJob() {
     {}
   );
 
+  if (!latestNotificationUrl) {
+    return;
+  }
+
   const notificationsListCache = await ExtStorage.getNotificationsListCache();
   if (!notificationsListCache?.includes(latestNotificationUrl)) {
     await ExtBadge.setText('new');
@@ -41,7 +45,7 @@ alarm.listen();
 
 chrome.runtime.onInstalled.addListener(async (details) => {
   if (details.reason !== 'install') {
-    await ExtStorage.clear();
+    await ExtStorage.clean();
   }
   try {
     await handleFetchNotificationJob();

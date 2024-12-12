@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const fetcher = new NotificationFetcher();
 
   await fetcher.fetch();
-  fetcher.sort();
+  await fetcher.sort();
   fetcher.display();
   await fetcher.cache();
 

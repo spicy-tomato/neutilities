@@ -1,33 +1,98 @@
 export class ExtStorage {
-  static #postsLinkConcatenationKey = 'postsLinkConcatenation';
+  static #notificationsListKey = 'notificationsListKey';
+  static #pinnedNotificationsListKey = 'pinnedNotificationsListKey';
+  static #temporaryKeys = [this.#notificationsListKey];
 
   /**
    * Clear storage
    * @returns {Promise.<void>}
    */
-  static async clear() {
-    await chrome.storage.sync.clear();
+  static async clean() {
+    const removeStoragePromises = this.#temporaryKeys.map(
+      async (key) => await chrome.storage.sync.remove(key)
+    );
+    await Promise.all(removeStoragePromises);
   }
 
   /**
-   * Save latest notification's url concatenation
+   * Get notifications' url concatenation
+   * @returns {Promise.<string | undefined>}
+   */
+  static async getNotificationsListCache() {
+    return await this.#get(this.#notificationsListKey);
+  }
+
+  /**
+   * Save notifications' url concatenation
    * @param {Array.<import('../functions/fetch-notification').NeuNotification>} notifications
    * @returns {Promise.<void>}
    */
   static async setNotificationsListCache(notifications) {
     const concatenation = notifications.map((n) => n.href).join('');
-    await chrome.storage.sync.set({
-      [this.#postsLinkConcatenationKey]: concatenation,
-    });
+    await this.#set(this.#notificationsListKey, concatenation);
   }
 
   /**
-   * Get latest notification's url concatenation
-   * @returns {Promise.<string | undefined>}
+   * Get pinned notifications' url
+   * @returns {Promise.<Set<string>>}
    */
-  static async getNotificationsListCache() {
-    return (await chrome.storage.sync.get(this.#postsLinkConcatenationKey))?.[
-      this.#postsLinkConcatenationKey
-    ];
+  static async getPinnedNotificationUrls() {
+    const urls = (await this.#get(this.#pinnedNotificationsListKey)) ?? [];
+    return new Set(urls);
+  }
+
+  /**
+   * Add pinned notification's url
+   * @param {string} url
+   * @returns {Promise.<void>}
+   */
+  static async addPinnedNotification(url) {
+    const pinnedNotificationUrls = await this.getPinnedNotificationUrls();
+
+    if (!pinnedNotificationUrls.has(url)) {
+      pinnedNotificationUrls.add(url);
+
+      await this.#set(
+        this.#pinnedNotificationsListKey,
+        Array.from(pinnedNotificationUrls)
+      );
+    }
+  }
+
+  /**
+   * Remove pinned notification's url
+   * @param {string} url
+   * @returns {Promise.<void>}
+   */
+  static async removePinnedNotification(url) {
+    let pinnedNotificationsList = await this.getPinnedNotificationUrls();
+
+    pinnedNotificationsList.delete(url);
+
+    await this.#set(
+      this.#pinnedNotificationsListKey,
+      Array.from(pinnedNotificationsList)
+    );
+  }
+
+  /**
+   * Get value from Chrome storage
+   * @param {string} key
+   * @returns {Promise}
+   */
+  static async #get(key) {
+    return (await chrome.storage.sync.get(key))?.[key];
+  }
+
+  /**
+   * Set value to Chrome storage
+   * @param {string} key
+   * @param {*} value
+   * @returns {Promise.<void>}
+   */
+  static async #set(key, value) {
+    await chrome.storage.sync.set({
+      [key]: value,
+    });
   }
 }

@@ -31,8 +31,8 @@ async function handleMessages(message, _sender, sendResponse) {
  */
 async function fetchNotification(sendResponse) {
   const fetcher = new NotificationFetcher();
-  await fetcher.fetch();
-  sendResponse(fetcher.latestNotificationUrl);
+  const latestNotificationUrl = await fetcher.fetchLatestUrl();
+  sendResponse(latestNotificationUrl);
 }
 
 //////////////////////////////////////////////////
