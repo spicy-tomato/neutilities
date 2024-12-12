@@ -14,7 +14,7 @@ export class ExtStorage {
    * @param {Array.<import('../functions/fetch-notification').NeuNotification>} notifications
    * @returns {Promise.<void>}
    */
-  static async setPostsLinkConcatenation(notifications) {
+  static async setNotificationsListCache(notifications) {
     const concatenation = notifications.map((n) => n.href).join('');
     await chrome.storage.sync.set({
       [this.#postsLinkConcatenationKey]: concatenation,
@@ -25,7 +25,7 @@ export class ExtStorage {
    * Get latest notification's url concatenation
    * @returns {Promise.<string | undefined>}
    */
-  static async getPostsLinkConcatenation() {
+  static async getNotificationsListCache() {
     return (await chrome.storage.sync.get(this.#postsLinkConcatenationKey))?.[
       this.#postsLinkConcatenationKey
     ];

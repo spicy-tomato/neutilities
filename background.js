@@ -15,8 +15,8 @@ async function handleFetchNotificationJob() {
     {}
   );
 
-  const postsLinkConcatenation = await ExtStorage.getPostsLinkConcatenation();
-  if (!postsLinkConcatenation?.includes(latestNotificationUrl)) {
+  const notificationsListCache = await ExtStorage.getNotificationsListCache();
+  if (!notificationsListCache?.includes(latestNotificationUrl)) {
     await ExtBadge.setText('new');
   }
 }

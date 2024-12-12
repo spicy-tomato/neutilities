@@ -107,16 +107,20 @@ export class NotificationFetcher {
   }
 
   /**
-   *
+   * Caching notifications
+   * @returns {Promise.<void>}
    */
   async cache() {
     if (this.#notifications.length <= 0) {
       return;
     }
 
-    ExtStorage.setPostsLinkConcatenation(this.#notifications);
+    await ExtStorage.setNotificationsListCache(this.#notifications);
   }
 
+  /**
+   * Sort notifications order by descending date
+   */
   sort() {
     this.#notifications.sort((a, b) => {
       if (a.isoDate !== b.isoDate) {

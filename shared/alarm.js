@@ -14,6 +14,10 @@ export class ExtAlarm {
     this.#alarmsHandler.set(name, callback);
   }
 
+  /**
+   * Listen to all alarms
+   * @returns {void}
+   */
   listen() {
     chrome.alarms.onAlarm.addListener((alarm) => {
       const handler = this.#alarmsHandler.get(alarm.name);
