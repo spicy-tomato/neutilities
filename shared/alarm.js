@@ -1,5 +1,5 @@
 export class ExtAlarm {
-  /** @type Map.<string, Function> */
+  /** @type {Map.<string, Function>} */
   #alarmsHandler = new Map();
 
   /**

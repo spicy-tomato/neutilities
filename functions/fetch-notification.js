@@ -5,7 +5,7 @@ import { ExtTab } from '../shared/tab.js';
 export class NeuNotification {
   /**
    * Constructor
-   * @param {string} idx Index of notification
+   * @param {number} idx Index of notification
    * @param {string} title Title of notification
    * @param {string} href URL of notification
    * @param {string} date published date of notification
@@ -47,16 +47,13 @@ export class NotificationFetcher {
         '.divmain > div:nth-child(2) > div'
       );
 
-      if (domNotificationElements.length <= 0) {
-        domNotificationElements.innerText = 'No notifications found.';
-        return;
-      }
-
       this.#notifications = [];
       let idx = 0;
 
       for (const notificationElement of domNotificationElements) {
+        /** @type {HTMLAnchorElement} */
         const aTag = notificationElement.querySelector('a');
+        /** @type {HTMLElement} */
         const iTag = notificationElement.querySelector('i');
 
         const dateStr = iTag.innerText.match(/\d{2}\/\d{2}\/\d{4}/)?.[0] ?? '';
@@ -66,7 +63,7 @@ export class NotificationFetcher {
           new NeuNotification(
             idx,
             aTag.innerText,
-            aTag.attributes.href.value,
+            aTag.attributes['href'].value,
             dateStr,
             dateStrIso
           )
@@ -84,14 +81,24 @@ export class NotificationFetcher {
    * @returns {void}
    */
   display() {
-    /** @type {HTMLElement} */
-    const template = document.getElementById('notification-item-template');
-    let elements = [];
+    const template = /** @type {HTMLTemplateElement} */ (
+      document.getElementById('notification-item-template')
+    );
+    /** @type {Array.<HTMLTableRowElement>} */
+    const elements = [];
 
     for (const notification of this.#notifications) {
-      const element = template.content.firstElementChild.cloneNode(true);
+      const element = /** @type {HTMLTableRowElement} */ (
+        template.content.firstElementChild.cloneNode(true)
+      );
+      /** @type {HTMLAnchorElement} */
       const domItemLink = element.querySelector('.notification-item');
+      /** @type {HTMLSpanElement} */
       const domItemDate = element.querySelector('.notification-date');
+      /** @type {SVGElement} */
+      const unpinnedBtn = element.querySelector('.pin-btn.pinned');
+      /** @type {SVGElement} */
+      const pinnedBtn = element.querySelector('.pin-btn.unpinned');
 
       domItemLink.textContent = notification.title;
       domItemDate.textContent = notification.date;
@@ -124,7 +131,7 @@ export class NotificationFetcher {
   sort() {
     this.#notifications.sort((a, b) => {
       if (a.isoDate !== b.isoDate) {
-        return new Date(b.isoDate) - new Date(a.isoDate);
+        return new Date(b.isoDate).getTime() - new Date(a.isoDate).getTime();
       }
       return a.idx - b.idx;
     });

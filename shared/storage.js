@@ -3,7 +3,7 @@ export class ExtStorage {
 
   /**
    * Clear storage
-   * @returns {Promise.<string | undefined>}
+   * @returns {Promise.<void>}
    */
   static async clear() {
     await chrome.storage.sync.clear();

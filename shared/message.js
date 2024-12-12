@@ -41,7 +41,7 @@ export class ExtMessage {
   /**
    * Listen to target via Chrome Message API
    * @param {MessageTarget} target
-   * @param {(message: MessageSender, sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => void} callback
+   * @param {(message: MessageModel, sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => void} callback
    * @param {boolean} isAsync
    */
   static async listenOnTarget(target, callback, isAsync) {
