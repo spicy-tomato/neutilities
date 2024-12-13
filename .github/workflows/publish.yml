@@ -2,6 +2,15 @@ name: Publish
 
 on:
   workflow_dispatch:
+    inputs:
+      submit:
+        description: 'Submit for review'
+        required: true
+        type: choice
+        default: 'false'
+        options:
+          - true
+          - false
 
 jobs:
   publish:
@@ -25,3 +34,4 @@ jobs:
           client-id: ${{ secrets.CLIENT_ID }}
           client-secret: ${{ secrets.CLIENT_SECRET }}
           refresh-token: ${{ secrets.REFRESH_TOKEN }}
+          publish: ${{ inputs.submit }}
