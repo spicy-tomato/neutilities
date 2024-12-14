@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.2.0](https://github.com/spicy-tomato/neutilities/compare/v1.1.0...v1.2.0) (2024-12-14)
+
+
+### Features
+
+* display tag `new` ([98e7be2](https://github.com/spicy-tomato/neutilities/commit/98e7be21a19c21f61997328620c2ad6e17157a64))
+* pin notification ([dd3d7e3](https://github.com/spicy-tomato/neutilities/commit/dd3d7e375e0410fd78b50a86d571c21b9b776035))
+
 ## [1.1.0](https://github.com/spicy-tomato/neutilities/compare/v1.0.1...v1.1.0) (2024-12-11)
 
 
