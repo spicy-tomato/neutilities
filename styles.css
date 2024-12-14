@@ -1,11 +1,13 @@
 :root {
-  --color-background: white;
-  --color-primary: #0076bc;
-  --color-primary-lighten: #f4f1fa;
-  --color-secondary: #fafafa;
-  --color-border: #ebebeb;
-  --color-text: #4a4a4a;
-  --color-text-lighten: #7a7a7a;
+  --background: white;
+  --primary: #145ca8;
+  --primary-lighten: #f4f1fa;
+  --secondary: #fafafa;
+  --border: #ebebeb;
+  --text: #4a4a4a;
+  --text-lighten: #7a7a7a;
+  --error: #db6a82;
+  --success: #2cc194;
 }
 
 * {
@@ -14,8 +16,8 @@
 }
 
 body {
-  background: var(--color-primary);
-  color: var(--color-text);
+  background: var(--primary);
+  color: var(--text);
   direction: ltr;
   font-family: Helvetica, Arial, sans-serif;
   font-size: 0.9rem;
@@ -31,7 +33,7 @@ body {
 a,
 a:focus,
 a:hover {
-  color: var(--color-primary);
+  color: var(--primary);
   outline: none;
   text-decoration: underline;
 }
@@ -47,18 +49,18 @@ table {
 }
 
 .popup {
-  background: var(--color-background);
+  background: var(--background);
   max-height: 34rem;
   overflow-y: auto;
 }
 
 h1 {
-  color: var(--color-primary-lighten);
+  color: var(--primary-lighten);
 }
 
 .header {
   align-items: center;
-  background: var(--color-primary);
+  background: var(--primary);
   display: flex;
   height: 4.5rem;
   justify-content: space-between;
@@ -75,14 +77,14 @@ h1 {
 
 .tabs {
   align-items: center;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-background);
+  border-bottom: 1px solid var(--border);
+  background: var(--background);
   display: flex;
   font-size: 0.8rem;
 }
 
 .tab {
-  color: var(--color-text-lighten);
+  color: var(--text-lighten);
   cursor: pointer;
   letter-spacing: 0.5px;
   padding: 1rem 1.5rem 0.8rem 1.5rem;
@@ -92,7 +94,7 @@ h1 {
 }
 
 .tab:hover {
-  background: var(--color-secondary);
+  background: var(--secondary);
 }
 
 .tab--disabled {
@@ -101,14 +103,14 @@ h1 {
 }
 
 .tab--active {
-  background: var(--color-primary-lighten);
-  border-bottom: 2px solid var(--color-primary);
-  color: var(--color-primary);
+  background: var(--primary-lighten);
+  border-bottom: 2px solid var(--primary);
+  color: var(--primary);
   pointer-events: none;
 }
 
 .tab-item {
-  background: var(--color-background);
+  background: var(--background);
   overflow: hidden;
   padding: 1rem 1.5rem 0 1.5rem;
 }
@@ -123,7 +125,7 @@ h1 {
 
 .notification-table td {
   padding: 0.25rem;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #a5abbd;
 }
 
 .notification-table a {
@@ -134,7 +136,7 @@ h1 {
 .tag {
   padding: 2px 4px;
   border-radius: 5px;
-  background-color: red;
+  background-color: var(--error);
   font-size: 10px;
   color: white;
   text-align: center;
