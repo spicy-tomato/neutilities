@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await fetcher.fetch();
   fetcher.sort();
-  await fetcher.markAsNew();
+  await fetcher.markNew();
+  await fetcher.markChanged();
   fetcher.display();
   await fetcher.cache();
 

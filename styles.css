@@ -136,11 +136,18 @@ h1 {
 .tag {
   padding: 2px 4px;
   border-radius: 5px;
-  background-color: var(--error);
   font-size: 10px;
   color: white;
   text-align: center;
   vertical-align: top;
+}
+
+.tag-new {
+  background-color: var(--error);
+}
+
+.tag-changed {
+  background-color: var(--success);
 }
 
 .pin-btn {

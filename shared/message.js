@@ -1,5 +1,8 @@
 const MessageTypeValues = {
-  FETCH_NOTIFICATION: 1,
+  FETCH_ALL_NOTIFICATIONS: 1,
+  FETCH_NOTIFICATION_DETAILS: 2,
+  PIN_NOTIFICATION: 3,
+  CLICK_NOTIFICATION: 4,
 };
 
 const MessageTargetValues = {
@@ -27,16 +30,28 @@ export class ExtMessage {
    * Send message via Chrome Message API
    *
    * @overload
-   * @param {MessageType} type
-   * @param {MessageTarget} target
-   * @param {*} data
-   * @returns {Promise.<*>}
+   * @param {'FETCH_ALL_NOTIFICATIONS'} type
+   * @param {'offscreen'} target
+   * @param {object} data
+   * @returns {Promise.<Array<string>>}
    */ /**
    * @overload
-   * @param {'FETCH_NOTIFICATION'} type
-   * @param {MessageTarget} target
-   * @param {*} data
-   * @returns {Promise.<Array<string>>}
+   * @param {'FETCH_NOTIFICATION_DETAILS'} type
+   * @param {'offscreen'} target
+   * @param {string} data
+   * @returns {Promise.<string>}
+   */ /**
+   * @overload
+   * @param {'PIN_NOTIFICATION'} type
+   * @param {'background'} target
+   * @param {string} data
+   * @returns {Promise.<void>}
+   */ /**
+   * @overload
+   * @param {'CLICK_NOTIFICATION'} type
+   * @param {'background'} target
+   * @param {string} data
+   * @returns {Promise.<void>}
    */
   static async send(type, target, data) {
     return chrome.runtime.sendMessage({

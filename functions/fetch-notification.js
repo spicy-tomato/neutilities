@@ -1,4 +1,5 @@
 import { SCHOOL_SITE } from '../shared/const.js';
+import { ExtMessage } from '../shared/message.js';
 import { ExtStorage } from '../shared/storage.js';
 import { ExtTab } from '../shared/tab.js';
 
@@ -19,6 +20,7 @@ export class NeuNotification {
     this.date = dateStr.match(/\d{2}\/\d{2}\/\d{4}/)?.[0] ?? '';
     this.isoDate = this.date.split('/').reverse().join('-');
     this.isNew = false;
+    this.isChanged = false;
   }
 }
 
@@ -124,15 +126,27 @@ export class NotificationFetcher {
   }
 
   /**
-   * Sort notifications order by descending date
+   * Mark notifications as new
    */
-  async markAsNew() {
+  async markNew() {
     const newNotifications = await NotificationFetcher.getNewNotifications(
       this.#notifications.map((n) => n.href)
     );
     this.#notifications.forEach((n) => {
       if (newNotifications.includes(n.href)) {
         n.isNew = true;
+      }
+    });
+  }
+
+  /**
+   * Mark notifications as changed
+   */
+  async markChanged() {
+    const changedNotifications = await ExtStorage.getChangedNotifications();
+    this.#notifications.forEach((n) => {
+      if (changedNotifications.includes(n.href)) {
+        n.isChanged = true;
       }
     });
   }
@@ -155,7 +169,9 @@ export class NotificationFetcher {
       /** @type {HTMLAnchorElement} */
       const domItemLink = element.querySelector('.notification-item');
       /** @type {HTMLSpanElement} */
-      const domTag = element.querySelector('.tag');
+      const domNewTag = element.querySelector('.tag-new');
+      /** @type {HTMLSpanElement} */
+      const domChangedTag = element.querySelector('.tag-changed');
       /** @type {HTMLSpanElement} */
       const domItemDate = element.querySelector('.notification-date');
       /** @type {SVGElement} */
@@ -173,32 +189,54 @@ export class NotificationFetcher {
       }
 
       if (notification.isNew) {
-        domTag.classList.remove('hidden');
+        domNewTag.classList.remove('hidden');
+      }
+
+      // Only pinned notifications can be marked as changed
+      if (notification.isPinned && notification.isChanged) {
+        domChangedTag.classList.remove('hidden');
       }
 
       // Add event triggers
       domItemLink.addEventListener('click', async () => {
         await ExtTab.create('SCHOOL_SITE', notification.href);
+        await ExtStorage.removeChangedNotification(notification.href);
+        await ExtMessage.send(
+          'CLICK_NOTIFICATION',
+          'background',
+          notification.href
+        );
       });
 
       unpinnedBtn.addEventListener('click', async () => {
         // Show pinned icon and save to storage
         unpinnedBtn.classList.add('hidden');
         pinnedBtn.classList.remove('hidden');
-        await ExtStorage.addPinnedNotification(notification.href);
         notification.isPinned = true;
+
         this.sort();
         this.display();
+
+        await ExtStorage.addPinnedNotification(notification.href);
+        await ExtMessage.send(
+          'PIN_NOTIFICATION',
+          'background',
+          notification.href
+        );
       });
 
       pinnedBtn.addEventListener('click', async () => {
         // Show unpinned icon and remove from storage
         pinnedBtn.classList.add('hidden');
         unpinnedBtn.classList.remove('hidden');
-        await ExtStorage.removePinnedNotification(notification.href);
         notification.isPinned = false;
+
         this.sort();
         this.display();
+
+        await ExtStorage.removePinnedNotification(notification.href);
+        await ExtStorage.removeNotification(notification.href);
+        await ExtStorage.removeChangedNotification(notification.href);
       });
 
       elements.push(element);

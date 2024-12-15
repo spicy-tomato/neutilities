@@ -1,11 +1,18 @@
 export class ExtBadge {
   /**
-   * Set badge text
-   * @param {string} text
+   * Setup styles for badge
    * @returns {Promise.<void>}
    */
-  static async setText(text) {
-    await chrome.action.setBadgeText({ text });
+  static async setup() {
+    await chrome.action.setBadgeBackgroundColor({ color: '#e863b4' });
+  }
+
+  /**
+   * Set badge text as `new`
+   * @returns {Promise.<void>}
+   */
+  static async setNew() {
+    this.#setText('new');
   }
 
   /**
@@ -14,5 +21,14 @@ export class ExtBadge {
    */
   static async clear() {
     await chrome.action.setBadgeText({ text: '' });
+  }
+
+  /**
+   * Set badge text
+   * @param {string} text
+   * @returns {Promise.<void>}
+   */
+  static async #setText(text) {
+    await chrome.action.setBadgeText({ text });
   }
 }

@@ -13,9 +13,9 @@ export class ExtTab {
   static #hostsMap = new Map([['SCHOOL_SITE', SCHOOL_SITE]]);
 
   /**
-   * Add new alarm
+   * Open new tab
    * @param {HostType} hostType
-   * @param {string} path
+   * @param {string} path - relative path to host URL
    * @returns {Promise.<void>}
    */
   static async create(hostType, path) {
