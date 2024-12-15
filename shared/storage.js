@@ -10,7 +10,7 @@ export class ExtStorage {
   ];
 
   /**
-   * Clear storage
+   * Remove temporary data from storage
    * @returns {Promise.<void>}
    */
   static async clean() {
@@ -18,6 +18,14 @@ export class ExtStorage {
       this.#remove(key)
     );
     await Promise.all(removeStoragePromises);
+  }
+
+  /**
+   * Clear storage
+   * @returns {Promise.<void>}
+   */
+  static async clear() {
+    await chrome.storage.sync.clear();
   }
 
   /**
