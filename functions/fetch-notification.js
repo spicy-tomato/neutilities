@@ -178,6 +178,8 @@ export class NotificationFetcher {
       const unpinnedBtn = element.querySelector('.pin-btn.unpinned');
       /** @type {SVGElement} */
       const pinnedBtn = element.querySelector('.pin-btn.pinned');
+      /** @type {SVGElement} */
+      const offlineBtn = element.querySelector('.offline-btn');
 
       // Update content
       domItemLink.textContent = notification.title;
@@ -186,6 +188,7 @@ export class NotificationFetcher {
       if (notification.isPinned) {
         unpinnedBtn.classList.add('hidden');
         pinnedBtn.classList.remove('hidden');
+        offlineBtn.classList.remove('hidden');
       }
 
       if (notification.isNew) {
