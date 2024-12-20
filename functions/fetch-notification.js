@@ -1,4 +1,5 @@
 import { SCHOOL_SITE } from '../shared/const.js';
+import { HtmlHelper } from '../shared/html-helper.js';
 import { ExtMessage } from '../shared/message.js';
 import { ExtStorage } from '../shared/storage.js';
 import { ExtTab } from '../shared/tab.js';
@@ -80,17 +81,19 @@ export class NeuNotification {
     domItemDate.textContent = this.date;
 
     if (this.isPinned) {
-      unpinnedBtn.classList.add('hidden');
-      pinnedBtn.classList.remove('hidden');
+      HtmlHelper.displayGroup({
+        display: [pinnedBtn],
+        hide: [unpinnedBtn],
+      });
     }
 
     if (this.isNew) {
-      domNewTag.classList.remove('hidden');
+      HtmlHelper.display(domNewTag);
     }
 
     // Only pinned notifications can be marked as changed
     if (this.isPinned && this.isChanged) {
-      domChangedTag.classList.remove('hidden');
+      HtmlHelper.display(domChangedTag);
     }
 
     // Add event triggers
@@ -98,8 +101,10 @@ export class NeuNotification {
 
     unpinnedBtn.addEventListener('click', () => {
       // Show pinned icon and save to storage
-      unpinnedBtn.classList.add('hidden');
-      pinnedBtn.classList.remove('hidden');
+      HtmlHelper.displayGroup({
+        display: [pinnedBtn],
+        hide: [unpinnedBtn],
+      });
 
       this.pin();
 
@@ -108,8 +113,10 @@ export class NeuNotification {
 
     pinnedBtn.addEventListener('click', () => {
       // Show unpinned icon and remove from storage
-      pinnedBtn.classList.add('hidden');
-      unpinnedBtn.classList.remove('hidden');
+      HtmlHelper.displayGroup({
+        display: [unpinnedBtn],
+        hide: [pinnedBtn],
+      });
 
       this.unpin();
 

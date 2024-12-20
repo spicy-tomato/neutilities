@@ -103,7 +103,7 @@ h1 {
   pointer-events: none;
 }
 
-.tab--active {
+.tab.active {
   background: var(--primary-lighten);
   border-bottom: 2px solid var(--primary);
   color: var(--primary);
@@ -114,14 +114,6 @@ h1 {
   padding: 1rem 1.5rem 0 1.5rem;
   background: var(--background);
   overflow: hidden;
-}
-
-.tab-item:nth-child(2) {
-  width: 31rem;
-}
-
-.tab-item--hidden {
-  display: none;
 }
 
 .notification-table td {
