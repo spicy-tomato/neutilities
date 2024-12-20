@@ -22,6 +22,142 @@ export class NeuNotification {
     this.isNew = false;
     this.isChanged = false;
   }
+
+  /**
+   * Pin notification
+   * @returns {Promise.<void>}
+   */
+  async pin() {
+    this.isPinned = true;
+
+    await ExtStorage.addPinnedNotification(this.href);
+    await ExtMessage.send('PIN_NOTIFICATION', 'background', this.href);
+  }
+
+  /**
+   * Unpin notification
+   * @returns {Promise.<void>}
+   */
+  async unpin() {
+    this.isPinned = false;
+
+    await ExtStorage.removePinnedNotification(this.href);
+    await ExtStorage.removeNotification(this.href);
+    await ExtStorage.removeChangedNotification(this.href);
+  }
+
+  async open() {
+    await ExtTab.create('SCHOOL_SITE', this.href);
+    await ExtStorage.removeChangedNotification(this.href);
+    await ExtMessage.send('CLICK_NOTIFICATION', 'background', this.href);
+  }
+
+  /**
+   *
+   * @param {HTMLTemplateElement} template
+   * @param {() => void} onRefresh
+   * @returns {HTMLTableRowElement}
+   */
+  toHtmlElement(template, onRefresh) {
+    const element = /** @type {HTMLTableRowElement} */ (
+      template.content.firstElementChild.cloneNode(true)
+    );
+    /** @type {HTMLAnchorElement} */
+    const domItemLink = element.querySelector('.notification-item');
+    /** @type {HTMLSpanElement} */
+    const domNewTag = element.querySelector('.tag-new');
+    /** @type {HTMLSpanElement} */
+    const domChangedTag = element.querySelector('.tag-changed');
+    /** @type {HTMLSpanElement} */
+    const domItemDate = element.querySelector('.notification-date');
+    /** @type {SVGElement} */
+    const unpinnedBtn = element.querySelector('.pin-btn.unpinned');
+    /** @type {SVGElement} */
+    const pinnedBtn = element.querySelector('.pin-btn.pinned');
+
+    // Update content
+    domItemLink.textContent = this.title;
+    domItemDate.textContent = this.date;
+
+    if (this.isPinned) {
+      unpinnedBtn.classList.add('hidden');
+      pinnedBtn.classList.remove('hidden');
+    }
+
+    if (this.isNew) {
+      domNewTag.classList.remove('hidden');
+    }
+
+    // Only pinned notifications can be marked as changed
+    if (this.isPinned && this.isChanged) {
+      domChangedTag.classList.remove('hidden');
+    }
+
+    // Add event triggers
+    domItemLink.addEventListener('click', () => this.open());
+
+    unpinnedBtn.addEventListener('click', () => {
+      // Show pinned icon and save to storage
+      unpinnedBtn.classList.add('hidden');
+      pinnedBtn.classList.remove('hidden');
+
+      this.pin();
+
+      onRefresh();
+    });
+
+    pinnedBtn.addEventListener('click', () => {
+      // Show unpinned icon and remove from storage
+      pinnedBtn.classList.add('hidden');
+      unpinnedBtn.classList.remove('hidden');
+
+      this.unpin();
+
+      onRefresh();
+    });
+
+    return element;
+  }
+
+  /**
+   * Get list of notifications from DOM NodeList
+   * @param {NodeListOf<Element>} nodeList
+   * @param {boolean} isRunFromBackground
+   * @returns {Promise<Array<NeuNotification>>}
+   */
+  static async getListFromNodeList(nodeList, isRunFromBackground) {
+    let idx = 0;
+    /** @type {Array.<NeuNotification>} */
+    const result = [];
+    /** @type {Set.<string>} */
+    const pinnedNotificationUrls = isRunFromBackground
+      ? new Set()
+      : await ExtStorage.getPinnedNotificationUrls();
+
+    for (const node of nodeList) {
+      /** @type {HTMLAnchorElement} */
+      const aTag = node.querySelector('a');
+      /** @type {HTMLElement} */
+      const iTag = node.querySelector('i');
+
+      const url = aTag.attributes['href'].value;
+      const isPinned = pinnedNotificationUrls.has(url);
+
+      result.push(
+        new NeuNotification(
+          idx,
+          aTag.innerText.trim(),
+          url,
+          iTag.innerText,
+          isPinned
+        )
+      );
+
+      idx++;
+    }
+
+    return result;
+  }
 }
 
 export class NotificationFetcher {
@@ -73,35 +209,10 @@ export class NotificationFetcher {
   async fetch(isRunFromBackground = false) {
     try {
       const domNotificationElements = await this.#retrieveNotificationsDom();
-      /** @type {Set.<string>} */
-      const pinnedNotificationUrls = isRunFromBackground
-        ? new Set()
-        : await ExtStorage.getPinnedNotificationUrls();
-
-      this.#notifications = [];
-      let idx = 0;
-
-      for (const notificationElement of domNotificationElements) {
-        /** @type {HTMLAnchorElement} */
-        const aTag = notificationElement.querySelector('a');
-        /** @type {HTMLElement} */
-        const iTag = notificationElement.querySelector('i');
-
-        const url = aTag.attributes['href'].value;
-        const isPinned = pinnedNotificationUrls.has(url);
-
-        this.#notifications.push(
-          new NeuNotification(
-            idx,
-            aTag.innerText.trim(),
-            url,
-            iTag.innerText,
-            isPinned
-          )
-        );
-
-        idx++;
-      }
+      this.#notifications = await NeuNotification.getListFromNodeList(
+        domNotificationElements,
+        isRunFromBackground
+      );
     } catch (error) {
       console.error('Error fetching notifications:', error);
     }
@@ -163,80 +274,9 @@ export class NotificationFetcher {
     const elements = [];
 
     for (const notification of this.#notifications) {
-      const element = /** @type {HTMLTableRowElement} */ (
-        template.content.firstElementChild.cloneNode(true)
-      );
-      /** @type {HTMLAnchorElement} */
-      const domItemLink = element.querySelector('.notification-item');
-      /** @type {HTMLSpanElement} */
-      const domNewTag = element.querySelector('.tag-new');
-      /** @type {HTMLSpanElement} */
-      const domChangedTag = element.querySelector('.tag-changed');
-      /** @type {HTMLSpanElement} */
-      const domItemDate = element.querySelector('.notification-date');
-      /** @type {SVGElement} */
-      const unpinnedBtn = element.querySelector('.pin-btn.unpinned');
-      /** @type {SVGElement} */
-      const pinnedBtn = element.querySelector('.pin-btn.pinned');
-
-      // Update content
-      domItemLink.textContent = notification.title;
-      domItemDate.textContent = notification.date;
-
-      if (notification.isPinned) {
-        unpinnedBtn.classList.add('hidden');
-        pinnedBtn.classList.remove('hidden');
-      }
-
-      if (notification.isNew) {
-        domNewTag.classList.remove('hidden');
-      }
-
-      // Only pinned notifications can be marked as changed
-      if (notification.isPinned && notification.isChanged) {
-        domChangedTag.classList.remove('hidden');
-      }
-
-      // Add event triggers
-      domItemLink.addEventListener('click', async () => {
-        await ExtTab.create('SCHOOL_SITE', notification.href);
-        await ExtStorage.removeChangedNotification(notification.href);
-        await ExtMessage.send(
-          'CLICK_NOTIFICATION',
-          'background',
-          notification.href
-        );
-      });
-
-      unpinnedBtn.addEventListener('click', async () => {
-        // Show pinned icon and save to storage
-        unpinnedBtn.classList.add('hidden');
-        pinnedBtn.classList.remove('hidden');
-        notification.isPinned = true;
-
+      const element = notification.toHtmlElement(template, () => {
         this.sort();
         this.display();
-
-        await ExtStorage.addPinnedNotification(notification.href);
-        await ExtMessage.send(
-          'PIN_NOTIFICATION',
-          'background',
-          notification.href
-        );
-      });
-
-      pinnedBtn.addEventListener('click', async () => {
-        // Show unpinned icon and remove from storage
-        pinnedBtn.classList.add('hidden');
-        unpinnedBtn.classList.remove('hidden');
-        notification.isPinned = false;
-
-        this.sort();
-        this.display();
-
-        await ExtStorage.removePinnedNotification(notification.href);
-        await ExtStorage.removeNotification(notification.href);
-        await ExtStorage.removeChangedNotification(notification.href);
       });
 
       elements.push(element);
