@@ -141,6 +141,7 @@ h1 {
   color: white;
   text-align: center;
   vertical-align: top;
+  white-space: nowrap;
 }
 
 .tag-new {
