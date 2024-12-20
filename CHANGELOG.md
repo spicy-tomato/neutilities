@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.4.0](https://github.com-spicy.tomato/spicy-tomato/neutilities/compare/v1.3.0...v1.4.0) (2024-12-20)
+
+
+### Features
+
+* use vietnamese ([cbc3918](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/cbc39189efeeb12c197092f2affabd7f9c98d4de))
+
 ## [1.3.0](https://github.com/spicy-tomato/neutilities/compare/v1.2.0...v1.3.0) (2024-12-16)
 
 
