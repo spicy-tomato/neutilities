@@ -1,15 +1,27 @@
 import { NotificationFetcher } from './functions/fetch-notification.js';
 import { ExtBadge } from './shared/badge.js';
+import { HtmlHelper } from './shared/html-helper.js';
 import { ExtStorage } from './shared/storage.js';
 
 function addEventTriggers() {
   /** @type {SVGElement} */
   const resetBtn = document.querySelector('.btn-reset');
+  /** @type {NodeListOf<HTMLDivElement>} */
+  const tabs = document.querySelectorAll('.tab');
+  /** @type {NodeListOf<HTMLDivElement>} */
+  const tabItems = document.querySelectorAll('.tab-item');
 
   resetBtn.addEventListener('click', async () => {
     await ExtStorage.clear();
     await ExtBadge.clear();
     fetch();
+  });
+
+  tabs.forEach((tab, idx) => {
+    tab.addEventListener('click', () => {
+      HtmlHelper.displayFromArray(idx, [...tabItems]);
+      HtmlHelper.activateFromArray(idx, [...tabs]);
+    });
   });
 }
 

@@ -1,3 +1,5 @@
+import { IndexedDbHelper } from './db.js';
+
 export class ExtStorage {
   static #notificationsKey = 'NOTIFICATIONS_LIST';
   static #changedNotificationsKey = 'CHANGED_NOTIFICATIONS';
@@ -93,26 +95,14 @@ export class ExtStorage {
    * @returns {Promise.<Map<string, string>>}
    */
   static async getSavedNotifications() {
-    const savedNotificationKeys = (await chrome.storage.sync.getKeys()).filter(
-      (key) => key.startsWith(this.#notificationPrefixKey)
+    const notifications = await IndexedDbHelper.getAll();
+    const savedNotifications = new Map(
+      notifications.map((x) => [
+        x.id.replace(this.#notificationPrefixKey, ''),
+        x.data,
+      ])
     );
-
-    const getSavedNotificationContentPromises = savedNotificationKeys.map(
-      (key) =>
-        this.#get(key).then((value) =>
-          typeof value === 'string' ? { key, value } : { key, value: '' }
-        )
-    );
-
-    const prefixLength = this.#notificationPrefixKey.length;
-    const savedNotifications = await Promise.all(
-      getSavedNotificationContentPromises
-    );
-    const savedNotificationsMap = new Map(
-      savedNotifications.map((x) => [x.key.substring(prefixLength), x.value])
-    );
-
-    return savedNotificationsMap;
+    return savedNotifications;
   }
 
   /**
@@ -123,7 +113,7 @@ export class ExtStorage {
    */
   static async saveNotification(url, content) {
     const key = this.#notificationPrefixKey + url;
-    await this.#set(key, content);
+    await IndexedDbHelper.save(key, content);
   }
 
   /**
@@ -133,7 +123,7 @@ export class ExtStorage {
    */
   static async removeNotification(url) {
     const key = this.#notificationPrefixKey + url;
-    await this.#remove(key);
+    await IndexedDbHelper.delete(key);
   }
 
   /**

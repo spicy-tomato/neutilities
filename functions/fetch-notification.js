@@ -60,70 +60,15 @@ export class NeuNotification {
    * @returns {HTMLTableRowElement}
    */
   toHtmlElement(template, onRefresh) {
-    const element = /** @type {HTMLTableRowElement} */ (
+    const row = /** @type {HTMLTableRowElement} */ (
       template.content.firstElementChild.cloneNode(true)
     );
-    /** @type {HTMLAnchorElement} */
-    const domItemLink = element.querySelector('.notification-item');
-    /** @type {HTMLSpanElement} */
-    const domNewTag = element.querySelector('.tag-new');
-    /** @type {HTMLSpanElement} */
-    const domChangedTag = element.querySelector('.tag-changed');
-    /** @type {HTMLSpanElement} */
-    const domItemDate = element.querySelector('.notification-date');
-    /** @type {SVGElement} */
-    const unpinnedBtn = element.querySelector('.pin-btn.unpinned');
-    /** @type {SVGElement} */
-    const pinnedBtn = element.querySelector('.pin-btn.pinned');
 
-    // Update content
-    domItemLink.textContent = this.title;
-    domItemDate.textContent = this.date;
+    this.#renderCommonContent(row);
 
-    if (this.isPinned) {
-      HtmlHelper.displayGroup({
-        display: [pinnedBtn],
-        hide: [unpinnedBtn],
-      });
-    }
+    this.#renderUiForPinFunction(row, onRefresh);
 
-    if (this.isNew) {
-      HtmlHelper.display(domNewTag);
-    }
-
-    // Only pinned notifications can be marked as changed
-    if (this.isPinned && this.isChanged) {
-      HtmlHelper.display(domChangedTag);
-    }
-
-    // Add event triggers
-    domItemLink.addEventListener('click', () => this.open());
-
-    unpinnedBtn.addEventListener('click', () => {
-      // Show pinned icon and save to storage
-      HtmlHelper.displayGroup({
-        display: [pinnedBtn],
-        hide: [unpinnedBtn],
-      });
-
-      this.pin();
-
-      onRefresh();
-    });
-
-    pinnedBtn.addEventListener('click', () => {
-      // Show unpinned icon and remove from storage
-      HtmlHelper.displayGroup({
-        display: [unpinnedBtn],
-        hide: [pinnedBtn],
-      });
-
-      this.unpin();
-
-      onRefresh();
-    });
-
-    return element;
+    return row;
   }
 
   /**
@@ -164,6 +109,76 @@ export class NeuNotification {
     }
 
     return result;
+  }
+
+  /**
+   *
+   * @param {HTMLTableRowElement} row
+   * @param {() => void} onRefresh
+   */
+  #renderUiForPinFunction(row, onRefresh) {
+    /** @type {HTMLSpanElement} */
+    const domChangedTag = row.querySelector('.tag-changed');
+    /** @type {SVGElement} */
+    const unpinnedBtn = row.querySelector('.pin-btn.unpinned');
+    /** @type {SVGElement} */
+    const pinnedBtn = row.querySelector('.pin-btn.pinned');
+
+    // Update content
+    HtmlHelper.displayByCondition(this.isPinned, [[pinnedBtn], [unpinnedBtn]]);
+
+    // Only pinned notifications can be marked as changed
+    if (this.isPinned && this.isChanged) {
+      HtmlHelper.display(domChangedTag);
+    }
+
+    unpinnedBtn.addEventListener('click', () => {
+      // Show pinned icon and save to storage
+      HtmlHelper.displayGroup({
+        display: [pinnedBtn],
+        hide: [unpinnedBtn],
+      });
+
+      this.pin();
+
+      onRefresh();
+    });
+
+    pinnedBtn.addEventListener('click', () => {
+      // Show unpinned icon and remove from storage
+      HtmlHelper.displayGroup({
+        display: [unpinnedBtn],
+        hide: [pinnedBtn],
+      });
+
+      this.unpin();
+
+      onRefresh();
+    });
+  }
+
+  /**
+   *
+   * @param {HTMLTableRowElement} row
+   */
+  #renderCommonContent(row) {
+    /** @type {HTMLAnchorElement} */
+    const domItemLink = row.querySelector('.notification-item');
+    /** @type {HTMLSpanElement} */
+    const domNewTag = row.querySelector('.tag-new');
+    /** @type {HTMLSpanElement} */
+    const domItemDate = row.querySelector('.notification-date');
+
+    // Update content
+    domItemLink.textContent = this.title;
+    domItemDate.textContent = this.date;
+
+    if (this.isNew) {
+      HtmlHelper.display(domNewTag);
+    }
+
+    // Add event triggers
+    domItemLink.addEventListener('click', () => this.open());
   }
 }
 
@@ -236,6 +251,7 @@ export class NotificationFetcher {
       if (!a.isPinned && b.isPinned) {
         return 1;
       }
+
       if (a.isoDate !== b.isoDate) {
         return new Date(b.isoDate).getTime() - new Date(a.isoDate).getTime();
       }

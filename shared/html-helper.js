@@ -1,6 +1,6 @@
 export class HtmlHelper {
   static #hiddenClass = 'hidden';
-  static #activeClass = 'hidden';
+  static #activeClass = 'active';
 
   //#region Display and hide
 
@@ -83,7 +83,7 @@ export class HtmlHelper {
    * @param {Element} element
    */
   static activate(element) {
-    this.#removeClass(element, this.#activeClass);
+    this.#addClass(element, this.#activeClass);
   }
 
   /**
@@ -91,7 +91,36 @@ export class HtmlHelper {
    * @param {Element} element
    */
   static deactivate(element) {
-    this.#addClass(element, this.#activeClass);
+    this.#removeClass(element, this.#activeClass);
+  }
+
+  /**
+   * Toggle activate and deactivate for multiple elements
+   * @param {Object} group
+   * @param {Array.<Element>} group.activate
+   * @param {Array.<Element>} group.deactivate
+   */
+  static activateGroup(group) {
+    group.activate.forEach((e) => this.activate(e));
+    group.deactivate.forEach((e) => this.deactivate(e));
+  }
+
+  /**
+   * Activate element at index `index` and deactivate the rest
+   * @param {number} index
+   * @param {Array.<Element>} elements
+   */
+  static activateFromArray(index, elements) {
+    const element = elements[index];
+    if (!element) {
+      console.warn(`Got falsy value at index ${index}`);
+      return;
+    }
+
+    this.activateGroup({
+      activate: [element],
+      deactivate: elements.filter((_, idx) => idx !== index),
+    });
   }
 
   //#endregion
