@@ -320,9 +320,12 @@ export class NotificationFetcher {
       return;
     }
 
-    await ExtStorage.setNotificationsListCache(
-      this.#notifications.map((n) => n.href)
-    );
+    const notificationsHref = this.#notifications.map((n) => n.href);
+
+    await Promise.all([
+      ExtStorage.setNotificationsListCache(notificationsHref),
+      ExtStorage.updateLastFetchedAt(notificationsHref),
+    ]);
   }
 
   /**

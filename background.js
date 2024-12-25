@@ -18,6 +18,8 @@ async function handleFetchNotificationJob() {
     {}
   );
 
+  ExtStorage.updateLastFetchedAt(notifications);
+
   const newNotifications =
     await NotificationFetcher.getNewNotifications(notifications);
 
@@ -69,6 +71,16 @@ async function handleFetchNotificationDetailsJob() {
 
   await ExtStorage.setChangedNotifications(changedNotifications);
   await ExtBadge.setNew();
+}
+
+/**
+ * @returns {Promise.<void>}
+ */
+async function handlePruneJob() {
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - 30);
+
+  await ExtStorage.pruneNotification(cutoffDate);
 }
 
 // #endregion
@@ -135,6 +147,7 @@ Promise.all([
     { periodInMinutes: 0.5 },
     handleFetchNotificationDetailsJob
   ),
+  alarm.add('PRUNE_ALARM', { periodInMinutes: 30 }, handlePruneJob),
 ]).then(() => alarm.listen());
 
 chrome.runtime.onInstalled.addListener(async (details) => {

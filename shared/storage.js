@@ -4,7 +4,6 @@ export class ExtStorage {
   static #notificationsKey = 'NOTIFICATIONS_LIST';
   static #changedNotificationsKey = 'CHANGED_NOTIFICATIONS';
   static #pinnedNotificationsKey = 'PINNED_NOTIFICATIONS';
-  static #notificationPrefixKey = '__post__';
 
   static #temporaryKeys = [
     this.#notificationsKey,
@@ -97,10 +96,7 @@ export class ExtStorage {
   static async getSavedNotifications() {
     const notifications = await IndexedDbHelper.getAll();
     const savedNotifications = new Map(
-      notifications.map((x) => [
-        x.id.replace(this.#notificationPrefixKey, ''),
-        x.data,
-      ])
+      notifications.map((x) => [x.id, x.data])
     );
     return savedNotifications;
   }
@@ -112,8 +108,16 @@ export class ExtStorage {
    * @returns {Promise.<void>}
    */
   static async saveNotification(url, content) {
-    const key = this.#notificationPrefixKey + url;
-    await IndexedDbHelper.save(key, content);
+    await IndexedDbHelper.save(url, content);
+  }
+
+  /**
+   * Update the `lastFetchedAt` field of selected notifications to the current time.
+   * @param {Array<string>} ids - The list of notification IDs to update.
+   * @returns {Promise<void>} A promise that resolves when the updates are complete.
+   */
+  static async updateLastFetchedAt(ids) {
+    await IndexedDbHelper.updateLastFetchedAt(ids);
   }
 
   /**
@@ -122,8 +126,16 @@ export class ExtStorage {
    * @returns {Promise.<void>}
    */
   static async removeNotification(url) {
-    const key = this.#notificationPrefixKey + url;
-    await IndexedDbHelper.delete(key);
+    await IndexedDbHelper.delete(url);
+  }
+
+  /**
+   * Remove saved notification from storage
+   * @param {Date} cutoffDate
+   * @returns {Promise.<void>}
+   */
+  static async pruneNotification(cutoffDate) {
+    await IndexedDbHelper.prune(cutoffDate);
   }
 
   /**
