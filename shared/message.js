@@ -1,6 +1,6 @@
 const MessageTypeValues = {
-  FETCH_ALL_NOTIFICATIONS: 1,
-  FETCH_NOTIFICATION_DETAILS: 2,
+  CHECK_NEW_NOTIFICATION: 1,
+  CHECK_RECENTLY_UPDATE_NOTIFICATION: 2,
   PIN_NOTIFICATION: 3,
   CLICK_NOTIFICATION: 4,
 };
@@ -30,13 +30,13 @@ export class ExtMessage {
    * Send message via Chrome Message API
    *
    * @overload
-   * @param {'FETCH_ALL_NOTIFICATIONS'} type
+   * @param {'CHECK_NEW_NOTIFICATION'} type
    * @param {'offscreen'} target
    * @param {object} data
    * @returns {Promise.<Array<string>>}
    */ /**
    * @overload
-   * @param {'FETCH_NOTIFICATION_DETAILS'} type
+   * @param {'CHECK_RECENTLY_UPDATE_NOTIFICATION'} type
    * @param {'offscreen'} target
    * @param {string} data
    * @returns {Promise.<string>}

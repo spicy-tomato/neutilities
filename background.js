@@ -8,12 +8,13 @@ import { ExtStorage } from './shared/storage.js';
 // #region job handlers
 
 /**
+ * Fetch all notifications' URL. If fetched data is different from cached data, then display badge `new`
  * @returns {Promise.<void>}
  */
-async function handleFetchNotificationJob() {
+async function handleCheckNewNotificationJob() {
   /** @type {Array.<string>} */
   const notifications = await ExtMessage.send(
-    'FETCH_ALL_NOTIFICATIONS',
+    'CHECK_NEW_NOTIFICATION',
     'offscreen',
     {}
   );
@@ -31,7 +32,7 @@ async function handleFetchNotificationJob() {
 /**
  * @returns {Promise.<void>}
  */
-async function handleFetchNotificationDetailsJob() {
+async function handleCheckRecentlyUpdateNotificationJob() {
   /** @type {Array.<{url: string, content: string}>} */
   const notifications = [];
   const pinnedNotificationUrls = await ExtStorage.getPinnedNotificationUrls();
@@ -39,7 +40,7 @@ async function handleFetchNotificationDetailsJob() {
   for (const url of pinnedNotificationUrls) {
     /** @type {string | null} */
     const content = await ExtMessage.send(
-      'FETCH_NOTIFICATION_DETAILS',
+      'CHECK_RECENTLY_UPDATE_NOTIFICATION',
       'offscreen',
       url
     );
@@ -76,7 +77,7 @@ async function handleFetchNotificationDetailsJob() {
 /**
  * @returns {Promise.<void>}
  */
-async function handlePruneJob() {
+async function handlePruneNotificationJob() {
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - 30);
 
@@ -94,7 +95,7 @@ async function handlePruneJob() {
 async function saveNotificationContent(url) {
   /** @type {string | null} */
   const content = await ExtMessage.send(
-    'FETCH_NOTIFICATION_DETAILS',
+    'CHECK_RECENTLY_UPDATE_NOTIFICATION',
     'offscreen',
     url
   );
@@ -138,16 +139,20 @@ const alarm = new ExtAlarm();
 
 Promise.all([
   alarm.add(
-    'FETCH_NOTIFICATION_ALARM',
+    'CHECK_NEW_NOTIFICATION_ALARM',
     { periodInMinutes: 0.5 },
-    handleFetchNotificationJob
+    handleCheckNewNotificationJob
   ),
   alarm.add(
-    'FETCH_NOTIFICATION_DETAILS_ALARM',
+    'CHECK_NEW_UPDATE_NOTIFICATION_ALARM',
     { periodInMinutes: 0.5 },
-    handleFetchNotificationDetailsJob
+    handleCheckRecentlyUpdateNotificationJob
   ),
-  alarm.add('PRUNE_ALARM', { periodInMinutes: 30 }, handlePruneJob),
+  alarm.add(
+    'PRUNE_NOTIFICATION_ALARM',
+    { periodInMinutes: 30 },
+    handlePruneNotificationJob
+  ),
 ]).then(() => alarm.listen());
 
 chrome.runtime.onInstalled.addListener(async (details) => {
@@ -155,9 +160,9 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     await ExtStorage.clean();
   }
   try {
-    await handleFetchNotificationJob();
+    await handleCheckNewNotificationJob();
   } catch (_) {
-    setTimeout(handleFetchNotificationJob, 5000);
+    setTimeout(handleCheckNewNotificationJob, 5000);
   }
 });
 

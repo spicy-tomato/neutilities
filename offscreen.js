@@ -15,10 +15,10 @@ async function handleMessages(message, _sender, sendResponse) {
   }
 
   switch (message.type) {
-    case 'FETCH_ALL_NOTIFICATIONS':
+    case 'CHECK_NEW_NOTIFICATION':
       await fetchNotifications(sendResponse);
       break;
-    case 'FETCH_NOTIFICATION_DETAILS':
+    case 'CHECK_RECENTLY_UPDATE_NOTIFICATION':
       await fetchNotificationDetails(message.data, sendResponse);
       break;
     default:
