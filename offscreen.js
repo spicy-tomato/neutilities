@@ -10,10 +10,6 @@ import { ExtMessage } from './shared/message.js';
  * @returns {Promise.<void>}
  */
 async function handleMessages(message, _sender, sendResponse) {
-  if (message.target !== 'offscreen') {
-    return;
-  }
-
   switch (message.type) {
     case 'CHECK_NEW_NOTIFICATION':
       await fetchNotifications(sendResponse);

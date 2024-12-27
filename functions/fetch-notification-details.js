@@ -10,8 +10,12 @@ export class NotificationDetailsFetcher {
     try {
       const htmlElement =
         await NotificationDetailsFetcher.#retrieveNotificationDom(url);
-      const html = NotificationDetailsFetcher.#minify(htmlElement.getHTML());
 
+      if (!htmlElement) {
+        return null;
+      }
+
+      const html = NotificationDetailsFetcher.#minify(htmlElement.getHTML());
       return html;
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -22,7 +26,7 @@ export class NotificationDetailsFetcher {
   /**
    * Retrieve notification DOM
    * @param {string} url
-   * @returns {Promise.<Element>}
+   * @returns {Promise.<Element | null>}
    */
   static async #retrieveNotificationDom(url) {
     const response = await fetch(SCHOOL_SITE + url);

@@ -23,8 +23,8 @@ export class HtmlHelper {
   /**
    * Toggle display and hide for multiple elements
    * @param {Object} group
-   * @param {Array.<Element>} group.display
-   * @param {Array.<Element>} group.hide
+   * @param {Array<Element>} group.display
+   * @param {Array<Element>} group.hide
    */
   static displayGroup(group) {
     group.display.forEach((e) => this.display(e));
@@ -34,7 +34,7 @@ export class HtmlHelper {
   /**
    * Display element at index `index` and hide the rest
    * @param {number} index
-   * @param {Array.<Element>} elements
+   * @param {Array<Element>} elements
    */
   static displayFromArray(index, elements) {
     const element = elements[index];
@@ -52,7 +52,7 @@ export class HtmlHelper {
   /**
    * Toggle display two groups by condition
    * @param {boolean} condition
-   * @param {Array.<Array<Element>>} groups
+   * @param {Array<Array<Element>>} groups
    */
   static displayByCondition(condition, groups) {
     if (groups.length !== 2) {
@@ -97,8 +97,8 @@ export class HtmlHelper {
   /**
    * Toggle activate and deactivate for multiple elements
    * @param {Object} group
-   * @param {Array.<Element>} group.activate
-   * @param {Array.<Element>} group.deactivate
+   * @param {Array<Element>} group.activate
+   * @param {Array<Element>} group.deactivate
    */
   static activateGroup(group) {
     group.activate.forEach((e) => this.activate(e));
@@ -108,7 +108,7 @@ export class HtmlHelper {
   /**
    * Activate element at index `index` and deactivate the rest
    * @param {number} index
-   * @param {Array.<Element>} elements
+   * @param {Array<Element>} elements
    */
   static activateFromArray(index, elements) {
     const element = elements[index];

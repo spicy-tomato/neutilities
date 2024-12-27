@@ -14,7 +14,13 @@ export class ExtOffscreen {
         justification,
       });
     } catch (error) {
-      if (!error.message?.startsWith('Only a single offscreen')) {
+      if (
+        !(
+          /** @type {*} */ (error).message?.startsWith(
+            'Only a single offscreen'
+          )
+        )
+      ) {
         throw error;
       }
     }

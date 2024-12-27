@@ -1,9 +1,12 @@
 import { NotificationFetcher } from './functions/fetch-notification.js';
 import { ExtAlarm } from './shared/alarm.js';
 import { ExtBadge } from './shared/badge.js';
+import { NotificationDb } from './shared/db/notification.db.js';
 import { ExtMessage } from './shared/message.js';
 import { ExtOffscreen } from './shared/offscreen.js';
-import { ExtStorage } from './shared/storage.js';
+import { StorageHelper } from './shared/storage/storage.helper.js';
+
+const UPDATE_NOTIFICATION_BATCH = 5;
 
 // #region job handlers
 
@@ -12,17 +15,25 @@ import { ExtStorage } from './shared/storage.js';
  * @returns {Promise.<void>}
  */
 async function handleCheckNewNotificationJob() {
-  /** @type {Array.<string>} */
-  const notifications = await ExtMessage.send(
+  /** @type {Array<string>} */
+  const notificationIds = await ExtMessage.send(
     'CHECK_NEW_NOTIFICATION',
     'offscreen',
     {}
   );
 
-  ExtStorage.updateLastFetchedAt(notifications);
+  const notificationDb = new NotificationDb();
+  const currentTime = new Date().toISOString();
 
-  const newNotifications =
-    await NotificationFetcher.getNewNotifications(notifications);
+  await Promise.all(
+    notificationIds.map((id) =>
+      notificationDb.patch(id, { lastFetchedAt: currentTime })
+    )
+  );
+
+  const newNotifications = await NotificationFetcher.getNewNotifications(
+    notificationIds
+  );
 
   if (newNotifications.length > 0) {
     await ExtBadge.setNew();
@@ -33,45 +44,74 @@ async function handleCheckNewNotificationJob() {
  * @returns {Promise.<void>}
  */
 async function handleCheckRecentlyUpdateNotificationJob() {
-  /** @type {Array.<{url: string, content: string}>} */
-  const notifications = [];
-  const pinnedNotificationUrls = await ExtStorage.getPinnedNotificationUrls();
+  /** @type {Array<{url: string, data: string}>} */
+  const crawledNotifications = [];
+  const notificationDb = new NotificationDb();
 
-  for (const url of pinnedNotificationUrls) {
+  /** @type {Array<import('./shared/db/notification.db.js').DbNotification>} */
+  const oldestFiveNotifications = await notificationDb.get({
+    field: 'lastUpdatedAt',
+    value: undefined,
+    limit: UPDATE_NOTIFICATION_BATCH,
+  });
+
+  if (oldestFiveNotifications.length < UPDATE_NOTIFICATION_BATCH) {
+    const itemsWithLastUpdatedAtCount =
+      UPDATE_NOTIFICATION_BATCH - oldestFiveNotifications.length;
+    oldestFiveNotifications.push(
+      ...(await notificationDb.get({
+        field: 'lastUpdatedAt',
+        direction: 'next',
+        limit: itemsWithLastUpdatedAtCount,
+      }))
+    );
+  }
+
+  for (const url of oldestFiveNotifications.map((n) => n.id)) {
     /** @type {string | null} */
-    const content = await ExtMessage.send(
+    const data = await ExtMessage.send(
       'CHECK_RECENTLY_UPDATE_NOTIFICATION',
       'offscreen',
       url
     );
-    if (!!content) {
-      notifications.push({ url, content });
+    if (!!data) {
+      crawledNotifications.push({ url, data });
     }
   }
 
-  if (notifications.length <= 0) {
+  if (crawledNotifications.length <= 0) {
     return;
   }
 
-  /** @type {Array.<string>} */
-  const changedNotifications = [];
-  const savedNotifications = await ExtStorage.getSavedNotifications();
+  let isNotificationsUpdated = false;
 
-  for (const notification of notifications) {
-    if (
-      savedNotifications.has(notification.url) &&
-      savedNotifications.get(notification.url) !== notification.content
-    ) {
-      changedNotifications.push(notification.url);
+  for (const crawledNotification of crawledNotifications) {
+    const savedNotification = oldestFiveNotifications.find(
+      (n) => n.id === crawledNotification.url
+    );
+
+    if (!savedNotification || !savedNotification.data) {
+      await notificationDb.patch(crawledNotification.url, {
+        data: crawledNotification.data,
+        lastUpdatedAt: new Date().toISOString(),
+      });
+    } else if (savedNotification.data === crawledNotification.data) {
+      await notificationDb.patch(crawledNotification.url, {
+        lastUpdatedAt: new Date().toISOString(),
+      });
+    } else {
+      await notificationDb.patch(crawledNotification.url, {
+        data: crawledNotification.data,
+        isUpdated: true,
+        lastUpdatedAt: new Date().toISOString(),
+      });
+      isNotificationsUpdated = true;
     }
   }
 
-  if (changedNotifications.length <= 0) {
-    return;
+  if (isNotificationsUpdated) {
+    await ExtBadge.setNew();
   }
-
-  await ExtStorage.setChangedNotifications(changedNotifications);
-  await ExtBadge.setNew();
 }
 
 /**
@@ -81,48 +121,7 @@ async function handlePruneNotificationJob() {
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - 30);
 
-  await ExtStorage.pruneNotification(cutoffDate);
-}
-
-// #endregion
-
-// #region message handlers
-
-/**
- * @param {string} url
- * @returns {Promise.<void>}
- */
-async function saveNotificationContent(url) {
-  /** @type {string | null} */
-  const content = await ExtMessage.send(
-    'CHECK_RECENTLY_UPDATE_NOTIFICATION',
-    'offscreen',
-    url
-  );
-
-  await ExtStorage.saveNotification(url, content ?? '');
-}
-
-/**
- *
- * @param {import('./shared/message.js').MessageModel} message
- * @param {chrome.runtime.MessageSender} _sender
- * @returns {Promise.<void>}
- */
-async function handleMessages(message, _sender) {
-  if (message.target !== 'background') {
-    return;
-  }
-
-  switch (message.type) {
-    case 'PIN_NOTIFICATION':
-    case 'CLICK_NOTIFICATION':
-      await saveNotificationContent(message.data);
-      break;
-    default:
-      console.warn(`Unexpected message type received: '${message.type}'.`);
-      return;
-  }
+  new NotificationDb().prune(cutoffDate);
 }
 
 // #endregion
@@ -157,7 +156,7 @@ Promise.all([
 
 chrome.runtime.onInstalled.addListener(async (details) => {
   if (details.reason !== 'install') {
-    await ExtStorage.clean();
+    await new StorageHelper().clean('extension');
   }
   try {
     await handleCheckNewNotificationJob();
@@ -165,7 +164,5 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     setTimeout(handleCheckNewNotificationJob, 5000);
   }
 });
-
-ExtMessage.listenOnTarget('background', handleMessages, true);
 
 ExtBadge.setup();

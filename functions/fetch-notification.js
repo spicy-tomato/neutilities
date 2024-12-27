@@ -1,7 +1,9 @@
 import { SCHOOL_SITE } from '../shared/const.js';
-import { HtmlHelper } from '../shared/html-helper.js';
+import { NotificationDb } from '../shared/db/notification.db.js';
+import { HtmlHelper } from '../shared/helpers/html-helper.js';
 import { ExtMessage } from '../shared/message.js';
-import { ExtStorage } from '../shared/storage.js';
+import { ListStorage } from '../shared/storage/list.storage.js';
+import { PinStorage } from '../shared/storage/pin.storage.js';
 import { ExtTab } from '../shared/tab.js';
 
 export class NeuNotification {
@@ -31,7 +33,8 @@ export class NeuNotification {
   async pin() {
     this.isPinned = true;
 
-    await ExtStorage.addPinnedNotification(this.href);
+    await new PinStorage().add(this.href);
+
     await ExtMessage.send('PIN_NOTIFICATION', 'background', this.href);
   }
 
@@ -42,14 +45,12 @@ export class NeuNotification {
   async unpin() {
     this.isPinned = false;
 
-    await ExtStorage.removePinnedNotification(this.href);
-    await ExtStorage.removeNotification(this.href);
-    await ExtStorage.removeChangedNotification(this.href);
+    await new PinStorage().removePinnedNotification(this.href);
+    await new NotificationDb().remove(this.href);
   }
 
   async open() {
     await ExtTab.create('SCHOOL_SITE', this.href);
-    await ExtStorage.removeChangedNotification(this.href);
     await ExtMessage.send('CLICK_NOTIFICATION', 'background', this.href);
   }
 
@@ -57,18 +58,22 @@ export class NeuNotification {
    *
    * @param {HTMLTemplateElement} template
    * @param {() => void} onRefresh
-   * @returns {HTMLTableRowElement}
+   * @returns {HTMLTableRowElement | null}
    */
   toHtmlElement(template, onRefresh) {
-    const row = /** @type {HTMLTableRowElement} */ (
-      template.content.firstElementChild.cloneNode(true)
+    const row = /** @type {HTMLTableRowElement | null} */ (
+      template.content.firstElementChild?.cloneNode(true)
     );
 
-    this.#renderCommonContent(row);
+    if (row) {
+      this.#renderCommonContent(row);
 
-    this.#renderUiForPinFunction(row, onRefresh);
+      this.#renderUiForPinFunction(row, onRefresh);
 
-    return row;
+      return row;
+    }
+
+    return null;
   }
 
   /**
@@ -79,31 +84,25 @@ export class NeuNotification {
    */
   static async getListFromNodeList(nodeList, isRunFromBackground) {
     let idx = 0;
-    /** @type {Array.<NeuNotification>} */
+    /** @type {Array<NeuNotification>} */
     const result = [];
     /** @type {Set.<string>} */
     const pinnedNotificationUrls = isRunFromBackground
       ? new Set()
-      : await ExtStorage.getPinnedNotificationUrls();
+      : await new PinStorage().get();
 
     for (const node of nodeList) {
-      /** @type {HTMLAnchorElement} */
+      /** @type {HTMLAnchorElement | null} */
       const aTag = node.querySelector('a');
-      /** @type {HTMLElement} */
+      /** @type {HTMLElement | null} */
       const iTag = node.querySelector('i');
 
-      const url = aTag.attributes['href'].value;
-      const isPinned = pinnedNotificationUrls.has(url);
+      const title = aTag?.innerText.trim() ?? '';
+      const url = aTag?.attributes.getNamedItem('href')?.value ?? '';
+      const dateStr = iTag?.innerText ?? '';
+      const isPinned = !!url && pinnedNotificationUrls.has(url);
 
-      result.push(
-        new NeuNotification(
-          idx,
-          aTag.innerText.trim(),
-          url,
-          iTag.innerText,
-          isPinned
-        )
-      );
+      result.push(new NeuNotification(idx, title, url, dateStr, isPinned));
 
       idx++;
     }
@@ -117,44 +116,51 @@ export class NeuNotification {
    * @param {() => void} onRefresh
    */
   #renderUiForPinFunction(row, onRefresh) {
-    /** @type {HTMLSpanElement} */
+    /** @type {HTMLSpanElement | null} */
     const domChangedTag = row.querySelector('.tag-changed');
-    /** @type {SVGElement} */
+    /** @type {SVGElement | null} */
     const unpinnedBtn = row.querySelector('.pin-btn.unpinned');
-    /** @type {SVGElement} */
+    /** @type {SVGElement | null} */
     const pinnedBtn = row.querySelector('.pin-btn.pinned');
 
     // Update content
-    HtmlHelper.displayByCondition(this.isPinned, [[pinnedBtn], [unpinnedBtn]]);
+    if (pinnedBtn && unpinnedBtn) {
+      HtmlHelper.displayByCondition(this.isPinned, [
+        [pinnedBtn],
+        [unpinnedBtn],
+      ]);
+    }
 
     // Only pinned notifications can be marked as changed
-    if (this.isPinned && this.isChanged) {
+    if (this.isPinned && this.isChanged && domChangedTag) {
       HtmlHelper.display(domChangedTag);
     }
 
-    unpinnedBtn.addEventListener('click', () => {
-      // Show pinned icon and save to storage
-      HtmlHelper.displayGroup({
-        display: [pinnedBtn],
-        hide: [unpinnedBtn],
+    if (pinnedBtn && unpinnedBtn) {
+      unpinnedBtn.addEventListener('click', () => {
+        // Show pinned icon and save to storage
+        HtmlHelper.displayGroup({
+          display: [pinnedBtn],
+          hide: [unpinnedBtn],
+        });
+
+        this.pin();
+
+        onRefresh();
       });
 
-      this.pin();
+      pinnedBtn.addEventListener('click', () => {
+        // Show unpinned icon and remove from storage
+        HtmlHelper.displayGroup({
+          display: [unpinnedBtn],
+          hide: [pinnedBtn],
+        });
 
-      onRefresh();
-    });
+        this.unpin();
 
-    pinnedBtn.addEventListener('click', () => {
-      // Show unpinned icon and remove from storage
-      HtmlHelper.displayGroup({
-        display: [unpinnedBtn],
-        hide: [pinnedBtn],
+        onRefresh();
       });
-
-      this.unpin();
-
-      onRefresh();
-    });
+    }
   }
 
   /**
@@ -162,28 +168,32 @@ export class NeuNotification {
    * @param {HTMLTableRowElement} row
    */
   #renderCommonContent(row) {
-    /** @type {HTMLAnchorElement} */
+    /** @type {HTMLAnchorElement | null} */
     const domItemLink = row.querySelector('.notification-item');
-    /** @type {HTMLSpanElement} */
+    /** @type {HTMLSpanElement | null} */
     const domNewTag = row.querySelector('.tag-new');
-    /** @type {HTMLSpanElement} */
+    /** @type {HTMLSpanElement | null} */
     const domItemDate = row.querySelector('.notification-date');
 
     // Update content
-    domItemLink.textContent = this.title;
-    domItemDate.textContent = this.date;
+    if (domItemLink) {
+      domItemLink.textContent = this.title;
+    }
+    if (domItemDate) {
+      domItemDate.textContent = this.date;
+    }
 
-    if (this.isNew) {
+    if (this.isNew && domNewTag) {
       HtmlHelper.display(domNewTag);
     }
 
     // Add event triggers
-    domItemLink.addEventListener('click', () => this.open());
+    domItemLink?.addEventListener('click', () => this.open());
   }
 }
 
 export class NotificationFetcher {
-  /** @type {Array.<NeuNotification>} */
+  /** @type {Array<NeuNotification>} */
   #notifications = [];
 
   get notifications() {
@@ -192,15 +202,17 @@ export class NotificationFetcher {
 
   /**
    *
-   * @param {Array.<string>} notifications
+   * @param {Array<string>} notifications
    * @returns {Promise.<Array<string>>}
    */
   static async getNewNotifications(notifications) {
-    /** @type {Array.<string>} */
+    /** @type {Array<string>} */
     const result = [];
     let endIdx = notifications.length - 1;
 
-    const cachedNotifications = await ExtStorage.getNotificationsListCache();
+    const listStorage = new ListStorage();
+
+    const cachedNotifications = await listStorage.get();
 
     for (; endIdx >= 0; endIdx--) {
       if (cachedNotifications.includes(notifications[endIdx])) {
@@ -277,9 +289,13 @@ export class NotificationFetcher {
    * Mark notifications as changed
    */
   async markChanged() {
-    const changedNotifications = await ExtStorage.getChangedNotifications();
+    const changedNotificationIds = (
+      await new NotificationDb().get({ field: 'isUpdated', value: true })
+    ).map((n) => n.id);
+
+    // const changedNotifications = await new ChangedStorage().get();
     this.#notifications.forEach((n) => {
-      if (changedNotifications.includes(n.href)) {
+      if (changedNotificationIds.includes(n.href)) {
         n.isChanged = true;
       }
     });
@@ -293,7 +309,7 @@ export class NotificationFetcher {
     const template = /** @type {HTMLTemplateElement} */ (
       document.getElementById('notification-item-template')
     );
-    /** @type {Array.<HTMLTableRowElement>} */
+    /** @type {Array<HTMLTableRowElement>} */
     const elements = [];
 
     for (const notification of this.#notifications) {
@@ -302,13 +318,17 @@ export class NotificationFetcher {
         this.display();
       });
 
-      elements.push(element);
+      if (element) {
+        elements.push(element);
+      }
     }
 
     const domTable = document.querySelector('.notification-table');
 
-    domTable.textContent = '';
-    domTable.append(...elements);
+    if (domTable) {
+      domTable.textContent = '';
+      domTable.append(...elements);
+    }
   }
 
   /**
@@ -320,11 +340,19 @@ export class NotificationFetcher {
       return;
     }
 
-    const notificationsHref = this.#notifications.map((n) => n.href);
+    const notificationUrls = this.#notifications.map((n) => n.href);
+
+    const listStorage = new ListStorage();
+    const notificationDb = new NotificationDb();
+    const currentTime = new Date().toISOString();
+
+    const updateNotificationPromises = notificationUrls.map((url) =>
+      notificationDb.patch(url, { lastFetchedAt: currentTime })
+    );
 
     await Promise.all([
-      ExtStorage.setNotificationsListCache(notificationsHref),
-      ExtStorage.updateLastFetchedAt(notificationsHref),
+      listStorage.set(notificationUrls),
+      ...updateNotificationPromises,
     ]);
   }
 

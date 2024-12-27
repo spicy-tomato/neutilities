@@ -52,6 +52,11 @@ export class ExtMessage {
    * @param {'background'} target
    * @param {string} data
    * @returns {Promise.<void>}
+   */ /**
+   * @param {'CHECK_NEW_NOTIFICATION'|'CHECK_RECENTLY_UPDATE_NOTIFICATION'|'PIN_NOTIFICATION'|'CLICK_NOTIFICATION'} type
+   * @param {'offscreen'|'background'} target
+   * @param {object|string} data
+   * @returns {Promise.<Array<string>|string|void>}
    */
   static async send(type, target, data) {
     return chrome.runtime.sendMessage({

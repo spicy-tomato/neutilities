@@ -2,7 +2,8 @@
   "compilerOptions": {
     "target": "ES2023",
     "module": "CommonJS",
-    "checkJs": true
+    "checkJs": true,
+    "strict": true
   },
   "typeAcquisition": {
     "include": ["chrome"]

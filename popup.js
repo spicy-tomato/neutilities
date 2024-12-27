@@ -1,18 +1,18 @@
 import { NotificationFetcher } from './functions/fetch-notification.js';
 import { ExtBadge } from './shared/badge.js';
-import { HtmlHelper } from './shared/html-helper.js';
-import { ExtStorage } from './shared/storage.js';
+import { HtmlHelper } from './shared/helpers/html-helper.js';
+import { StorageHelper } from './shared/storage/storage.helper.js';
 
 function addEventTriggers() {
-  /** @type {SVGElement} */
+  /** @type {SVGElement | null} */
   const resetBtn = document.querySelector('.btn-reset');
   /** @type {NodeListOf<HTMLDivElement>} */
   const tabs = document.querySelectorAll('.tab');
   /** @type {NodeListOf<HTMLDivElement>} */
   const tabItems = document.querySelectorAll('.tab-item');
 
-  resetBtn.addEventListener('click', async () => {
-    await ExtStorage.clear();
+  resetBtn?.addEventListener('click', async () => {
+    await new StorageHelper().clear();
     await ExtBadge.clear();
     fetch();
   });
