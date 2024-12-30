@@ -132,7 +132,7 @@ export class NeuNotification {
     }
 
     // Only pinned notifications can be marked as changed
-    if (this.isPinned && this.isChanged && domChangedTag) {
+    if (this.isChanged && domChangedTag) {
       HtmlHelper.display(domChangedTag);
     }
 
