@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.5.0](https://github.com-spicy.tomato/spicy-tomato/neutilities/compare/v1.4.0...v1.5.0) (2024-12-30)
+
+
+### Features
+
+* check recently updated for every notifications ([af99ad3](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/af99ad36673c4acc5524034bda5cf65520059add))
+* prune notification with last fetched before 30 days ([806f580](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/806f580ed5d0d4c5b7728e8845a54f6045ab5f6d))
+* use IndexedDB to save notifications ([5f06f1e](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/5f06f1ebaa21a3b53cb2eb22cc6a1a7e6898a8bc))
+
 ## [1.4.0](https://github.com-spicy.tomato/spicy-tomato/neutilities/compare/v1.3.0...v1.4.0) (2024-12-20)
 
 
