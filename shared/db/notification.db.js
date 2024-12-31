@@ -30,8 +30,8 @@ export class NotificationDb extends Db {
   async prune(cutoffDate) {
     const db = await NotificationDb.getDb();
     return new Promise((resolve, reject) => {
-      const transaction = db.transaction(NotificationDb.dbName, 'readwrite');
-      const store = transaction.objectStore(NotificationDb.dbName);
+      const transaction = db.transaction(NotificationDb.storeName, 'readwrite');
+      const store = transaction.objectStore(NotificationDb.storeName);
       const request = store.getAll();
 
       request.onsuccess = async (event) => {
