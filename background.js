@@ -31,9 +31,8 @@ async function handleCheckNewNotificationJob() {
     )
   );
 
-  const newNotifications = await NotificationFetcher.getNewNotifications(
-    notificationIds
-  );
+  const newNotifications =
+    await NotificationFetcher.getNewNotifications(notificationIds);
 
   if (newNotifications.length > 0) {
     await ExtBadge.setNew();
@@ -62,9 +61,9 @@ async function handleCheckRecentlyUpdateNotificationJob() {
       UPDATE_NOTIFICATION_BATCH - notificationsWithoutUpdatedAt.length;
 
     notificationsWithLastUpdatedAtCount = await notificationDb.get({
-        field: 'lastUpdatedAt',
-        direction: 'next',
-        limit: itemsWithLastUpdatedAtCount,
+      field: 'lastUpdatedAt',
+      direction: 'next',
+      limit: itemsWithLastUpdatedAtCount,
     });
   }
 
@@ -108,7 +107,7 @@ async function handleCheckRecentlyUpdateNotificationJob() {
     } else {
       await notificationDb.patch(crawledNotification.url, {
         data: crawledNotification.data,
-        isUpdated: true,
+        isUpdated: 1,
         lastUpdatedAt: new Date().toISOString(),
       });
       isNotificationsUpdated = true;

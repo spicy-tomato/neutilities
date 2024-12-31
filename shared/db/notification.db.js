@@ -6,7 +6,7 @@ import { Db } from './db.js';
  * @property {string} [data]
  * @property {string} [lastUpdatedAt]
  * @property {string} lastFetchedAt
- * @property {boolean} [isUpdated]
+ * @property {number} [isUpdated]
  */
 
 /**
@@ -15,7 +15,7 @@ import { Db } from './db.js';
 export class NotificationDb extends Db {
   static db = null;
   static dbName = 'notificationsDb';
-  static version = 1;
+  static version = 2;
   static storeName = 'notifications';
 
   constructor() {
@@ -66,7 +66,7 @@ export class NotificationDb extends Db {
     });
   }
 
-  /** @type {Object.<number, (event: IDBDatabase) => void>} */
+  /** @type {Object.<number, (event: IDBDatabase, transaction: IDBTransaction) => void>} */
   static migrations = {
     1: (db) => {
       const store = db.createObjectStore(this.storeName, {
@@ -82,6 +82,29 @@ export class NotificationDb extends Db {
       store.createIndex('isUpdated', 'isUpdated', {
         unique: false,
       });
+    },
+    2: (db, tx) => {
+      /** @type {Promise<void>} */ (
+        new Promise((resolve, reject) => {
+          tx.oncomplete = () => {
+            const transaction = db.transaction(this.storeName, 'readwrite');
+            const store = transaction.objectStore(this.storeName);
+            const request = store.getAll();
+
+            request.onsuccess = (event) => {
+              const records = /** @type {IDBRequest<Array<DbNotification>>} */ (
+                event.target
+              ).result;
+
+              records.forEach((r) => (r.isUpdated = r.isUpdated ? 1 : 0));
+
+              resolve();
+            };
+            request.onerror = (event) =>
+              reject(/** @type {IDBRequest} */ (event.target).error);
+          };
+        })
+      );
     },
   };
 }

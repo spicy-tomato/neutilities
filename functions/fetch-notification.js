@@ -290,7 +290,7 @@ export class NotificationFetcher {
    */
   async markChanged() {
     const changedNotificationIds = (
-      await new NotificationDb().get({ field: 'isUpdated', value: true })
+      await new NotificationDb().get({ field: 'isUpdated', value: 1 })
     ).map((n) => n.id);
 
     // const changedNotifications = await new ChangedStorage().get();
@@ -349,7 +349,7 @@ export class NotificationFetcher {
     const updateNotificationPromises = notificationUrls.map((url) =>
       notificationDb.patch(url, {
         lastFetchedAt: currentTime,
-        isUpdated: false,
+        isUpdated: 0,
       })
     );
 

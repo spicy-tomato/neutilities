@@ -37,7 +37,7 @@ export class Db {
   static storeName;
 
   /**
-   * @type {Object.<number, (event: IDBDatabase) => void>}
+   * @type {Object.<number, (event: IDBDatabase, transaction: IDBTransaction) => void>}
    * @abstract
    */
   static migrations;
@@ -55,10 +55,13 @@ export class Db {
    */
   static async open() {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.dbName);
+      const request = indexedDB.open(this.dbName, this.version);
 
       request.onupgradeneeded = (event) => {
         const db = /** @type {IDBRequest<IDBDatabase>} */ (event.target).result;
+        const transaction = /** @type {IDBRequest<IDBDatabase>} */ (
+          event.target
+        ).transaction;
         const oldVersion = event.oldVersion || 0; // Old version or 0 if no version exists
         const newVersion = event.newVersion || this.version;
 
@@ -66,10 +69,14 @@ export class Db {
           `Upgrading database from version ${oldVersion} to ${newVersion}`
         );
 
+        if (!transaction) {
+          return;
+        }
+
         // Apply migrations
         for (let version = oldVersion + 1; version <= newVersion; version++) {
           if (this.migrations[version]) {
-            this.migrations[version](db);
+            this.migrations[version](db, transaction);
           }
         }
       };
