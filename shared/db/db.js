@@ -3,7 +3,7 @@
  * @template {keyof T & string} V
  * @typedef {Object} GetParamType
  * @property {V} [GetType.field]
- * @property {T[V]} [GetType.value]
+ * @property {T[V] | null} [GetType.value]
  * @property {IDBCursorDirection} [GetType.direction]
  * @property {number} [limit]
  */
@@ -200,7 +200,7 @@ export class Db {
           return;
         }
 
-        if (param.value === null || param.value === undefined) {
+        if (param.value === null) {
           cursorRequest = store.openCursor();
         } else {
           cursorRequest = store
@@ -217,7 +217,13 @@ export class Db {
         ).result;
 
         if (cursor && (!param.limit || result.length < param.limit)) {
-          if (cursor.value[param.field] === param.value) {
+          if (
+            param.value === undefined ||
+            cursor.value[param.field] === param.value ||
+            (param.value === null &&
+              (cursor.value[param.field] === null ||
+                cursor.value[param.field] === undefined))
+          ) {
             result.push(cursor.value);
           }
           cursor.continue();

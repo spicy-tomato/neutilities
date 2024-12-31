@@ -49,25 +49,31 @@ async function handleCheckRecentlyUpdateNotificationJob() {
   const notificationDb = new NotificationDb();
 
   /** @type {Array<import('./shared/db/notification.db.js').DbNotification>} */
-  const oldestFiveNotifications = await notificationDb.get({
+  let notificationsWithLastUpdatedAtCount = [];
+  /** @type {Array<import('./shared/db/notification.db.js').DbNotification>} */
+  const notificationsWithoutUpdatedAt = await notificationDb.get({
     field: 'lastUpdatedAt',
-    value: undefined,
+    value: null,
     limit: UPDATE_NOTIFICATION_BATCH,
   });
 
-  if (oldestFiveNotifications.length < UPDATE_NOTIFICATION_BATCH) {
+  if (notificationsWithoutUpdatedAt.length < UPDATE_NOTIFICATION_BATCH) {
     const itemsWithLastUpdatedAtCount =
-      UPDATE_NOTIFICATION_BATCH - oldestFiveNotifications.length;
-    oldestFiveNotifications.push(
-      ...(await notificationDb.get({
+      UPDATE_NOTIFICATION_BATCH - notificationsWithoutUpdatedAt.length;
+
+    notificationsWithLastUpdatedAtCount = await notificationDb.get({
         field: 'lastUpdatedAt',
         direction: 'next',
         limit: itemsWithLastUpdatedAtCount,
-      }))
-    );
+    });
   }
 
-  for (const url of oldestFiveNotifications.map((n) => n.id)) {
+  const fiveNotificationsToFetch = [
+    ...notificationsWithLastUpdatedAtCount,
+    ...notificationsWithoutUpdatedAt,
+  ];
+
+  for (const url of fiveNotificationsToFetch.map((n) => n.id)) {
     /** @type {string | null} */
     const data = await ExtMessage.send(
       'CHECK_RECENTLY_UPDATE_NOTIFICATION',
@@ -86,7 +92,7 @@ async function handleCheckRecentlyUpdateNotificationJob() {
   let isNotificationsUpdated = false;
 
   for (const crawledNotification of crawledNotifications) {
-    const savedNotification = oldestFiveNotifications.find(
+    const savedNotification = fiveNotificationsToFetch.find(
       (n) => n.id === crawledNotification.url
     );
 
