@@ -347,7 +347,10 @@ export class NotificationFetcher {
     const currentTime = new Date().toISOString();
 
     const updateNotificationPromises = notificationUrls.map((url) =>
-      notificationDb.patch(url, { lastFetchedAt: currentTime })
+      notificationDb.patch(url, {
+        lastFetchedAt: currentTime,
+        isUpdated: false,
+      })
     );
 
     await Promise.all([
