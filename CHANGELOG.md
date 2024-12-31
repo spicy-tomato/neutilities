@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.5.1](https://github.com-spicy.tomato/spicy-tomato/neutilities/compare/v1.5.0...v1.5.1) (2024-12-31)
+
+
+### Bug Fixes
+
+* do not display tag `updated` when display tag `new` ([9dd1e5e](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/9dd1e5e99bf533924728d11c694b6c7a3a142aa7))
+* notifications with which updated are not got into update batch ([bb37dd6](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/bb37dd6b0ec8c6b1e8ca7a2e2ef79996335fc39b))
+* prune not working ([0a727f8](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/0a727f889f8ca401df13a67fcd22c651d66afd53))
+* tag `updated` does not display ([16a0b77](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/16a0b772d09b73ebfe22cdcdae42b7dc6d959244))
+* tag `updated` should not be displayed from the second time onwards ([def8024](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/def802490b503072d1b9d0b11a153edcabd12c9d))
+
 ## [1.5.0](https://github.com-spicy.tomato/spicy-tomato/neutilities/compare/v1.4.0...v1.5.0) (2024-12-30)
 
 
