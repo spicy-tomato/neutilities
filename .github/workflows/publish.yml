@@ -23,7 +23,7 @@ jobs:
 
       - name: Compress
         run: |
-          zip -r neutilities.zip . -x ".git**" -x ".vscode**" -x ".prettier*" -x "*.md" -x "LICENSE" -x "jsconfig.json"
+          zip -r neutilities.zip . -x ".git**" -x ".vscode**" -x ".prettier*" -x "*.md" -x "LICENSE" -x "jsconfig.json" -x "package.json"
           du -s --block-size=k neutilities.zip
 
       - name: Upload & release

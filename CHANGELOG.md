@@ -2,32 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
-## [1.5.1](https://github.com-spicy.tomato/spicy-tomato/neutilities/compare/v1.5.0...v1.5.1) (2024-12-31)
+## [1.5.1](https://github.com/spicy-tomato/neutilities/compare/v1.5.0...v1.5.1) (2024-12-31)
 
 
 ### Bug Fixes
 
-* do not display tag `updated` when display tag `new` ([9dd1e5e](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/9dd1e5e99bf533924728d11c694b6c7a3a142aa7))
-* notifications with which updated are not got into update batch ([bb37dd6](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/bb37dd6b0ec8c6b1e8ca7a2e2ef79996335fc39b))
-* prune not working ([0a727f8](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/0a727f889f8ca401df13a67fcd22c651d66afd53))
-* tag `updated` does not display ([16a0b77](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/16a0b772d09b73ebfe22cdcdae42b7dc6d959244))
-* tag `updated` should not be displayed from the second time onwards ([def8024](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/def802490b503072d1b9d0b11a153edcabd12c9d))
+* do not display tag `updated` when display tag `new` ([9dd1e5e](https://github.com/spicy-tomato/neutilities/commit/9dd1e5e99bf533924728d11c694b6c7a3a142aa7))
+* notifications with which updated are not got into update batch ([bb37dd6](https://github.com/spicy-tomato/neutilities/commit/bb37dd6b0ec8c6b1e8ca7a2e2ef79996335fc39b))
+* prune not working ([0a727f8](https://github.com/spicy-tomato/neutilities/commit/0a727f889f8ca401df13a67fcd22c651d66afd53))
+* tag `updated` does not display ([16a0b77](https://github.com/spicy-tomato/neutilities/commit/16a0b772d09b73ebfe22cdcdae42b7dc6d959244))
+* tag `updated` should not be displayed from the second time onwards ([def8024](https://github.com/spicy-tomato/neutilities/commit/def802490b503072d1b9d0b11a153edcabd12c9d))
 
-## [1.5.0](https://github.com-spicy.tomato/spicy-tomato/neutilities/compare/v1.4.0...v1.5.0) (2024-12-30)
-
-
-### Features
-
-* check recently updated for every notifications ([af99ad3](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/af99ad36673c4acc5524034bda5cf65520059add))
-* prune notification with last fetched before 30 days ([806f580](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/806f580ed5d0d4c5b7728e8845a54f6045ab5f6d))
-* use IndexedDB to save notifications ([5f06f1e](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/5f06f1ebaa21a3b53cb2eb22cc6a1a7e6898a8bc))
-
-## [1.4.0](https://github.com-spicy.tomato/spicy-tomato/neutilities/compare/v1.3.0...v1.4.0) (2024-12-20)
+## [1.5.0](https://github.com/spicy-tomato/neutilities/compare/v1.4.0...v1.5.0) (2024-12-30)
 
 
 ### Features
 
-* use vietnamese ([cbc3918](https://github.com-spicy.tomato/spicy-tomato/neutilities/commit/cbc39189efeeb12c197092f2affabd7f9c98d4de))
+* check recently updated for every notifications ([af99ad3](https://github.com/spicy-tomato/neutilities/commit/af99ad36673c4acc5524034bda5cf65520059add))
+* prune notification with last fetched before 30 days ([806f580](https://github.com/spicy-tomato/neutilities/commit/806f580ed5d0d4c5b7728e8845a54f6045ab5f6d))
+* use IndexedDB to save notifications ([5f06f1e](https://github.com/spicy-tomato/neutilities/commit/5f06f1ebaa21a3b53cb2eb22cc6a1a7e6898a8bc))
+
+## [1.4.0](https://github.com/spicy-tomato/neutilities/compare/v1.3.0...v1.4.0) (2024-12-20)
+
+
+### Features
+
+* use vietnamese ([cbc3918](https://github.com/spicy-tomato/neutilities/commit/cbc39189efeeb12c197092f2affabd7f9c98d4de))
 
 ## [1.3.0](https://github.com/spicy-tomato/neutilities/compare/v1.2.0...v1.3.0) (2024-12-16)
 
