@@ -48,7 +48,15 @@ table {
   border-spacing: 0;
 }
 
-.popup {
+.spacer {
+  flex-grow: 1;
+}
+
+.hidden {
+  display: none;
+}
+
+.header-wrapper {
   max-height: 34rem;
   background: var(--background);
   overflow-y: auto;
@@ -67,12 +75,9 @@ h1 {
   background: var(--primary);
 }
 
-.spacer {
-  flex-grow: 1;
-}
-
-.hidden {
-  display: none;
+.links {
+  display: flex;
+  gap: 0.75rem;
 }
 
 .tabs {
