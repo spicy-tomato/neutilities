@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.7.0](https://github.com/spicy-tomato/neutilities/compare/v1.6.0...v1.7.0) (2025-01-08)
+
+
+### Features
+
+* read offline ([4023e54](https://github.com/spicy-tomato/neutilities/commit/4023e544e4b70d3dfe0b4a6dc5f98635bdf8658c))
+
 ## [1.6.0](https://github.com/spicy-tomato/neutilities/compare/v1.5.1...v1.6.0) (2025-01-07)
 
 
