@@ -6,13 +6,13 @@ import { ExtTab } from './shared/tab.js';
 
 function addEventTriggers() {
   /** @type {SVGElement | null} */
-  const homeBtn = document.querySelector('.btn-home');
+  const homeBtn = document.querySelector('.home-btn');
   /** @type {SVGElement | null} */
-  const extensionBtn = document.querySelector('.btn-extension');
+  const extensionBtn = document.querySelector('.extension-btn');
   /** @type {SVGElement | null} */
-  const githubBtn = document.querySelector('.btn-github');
+  const githubBtn = document.querySelector('.github-btn');
   /** @type {SVGElement | null} */
-  const resetBtn = document.querySelector('.btn-reset');
+  const resetBtn = document.querySelector('.reset-btn');
   /** @type {NodeListOf<HTMLDivElement>} */
   const tabs = document.querySelectorAll('.tab');
   /** @type {NodeListOf<HTMLDivElement>} */
