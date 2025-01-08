@@ -19,15 +19,15 @@ function addEventTriggers() {
   const tabItems = document.querySelectorAll('.tab-item');
 
   homeBtn?.addEventListener('click', async () => {
-    ExtTab.create('SCHOOL_SITE');
+    ExtTab.openExternal('SCHOOL_SITE');
   });
 
   extensionBtn?.addEventListener('click', async () => {
-    ExtTab.create('EXTENSION_URL');
+    ExtTab.openExternal('EXTENSION_URL');
   });
 
   githubBtn?.addEventListener('click', async () => {
-    ExtTab.create('REPOSITORY_URL');
+    ExtTab.openExternal('REPOSITORY_URL');
   });
 
   resetBtn?.addEventListener('click', async () => {

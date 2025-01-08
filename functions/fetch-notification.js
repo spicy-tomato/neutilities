@@ -50,7 +50,7 @@ export class NeuNotification {
   }
 
   async open() {
-    await ExtTab.create('SCHOOL_SITE', this.href);
+    await ExtTab.openExternal('SCHOOL_SITE', this.href);
     await ExtMessage.send('CLICK_NOTIFICATION', 'background', this.href);
   }
 
@@ -69,6 +69,8 @@ export class NeuNotification {
       this.#renderCommonContent(row);
 
       this.#renderUiForPinFunction(row, onRefresh);
+
+      this.#renderUiForOfflineFunction(row);
 
       return row;
     }
@@ -158,6 +160,27 @@ export class NeuNotification {
         this.unpin();
 
         onRefresh();
+      });
+    }
+  }
+
+  /**
+   *
+   * @param {HTMLTableRowElement} row
+   */
+  #renderUiForOfflineFunction(row) {
+    /** @type {SVGElement | null} */
+    const offlineBtn = row.querySelector('.offline-btn');
+
+    if (offlineBtn) {
+      new NotificationDb().getById(this.href).then((notification) => {
+        if (notification?.data) {
+          HtmlHelper.display(offlineBtn);
+
+          offlineBtn.addEventListener('click', () => {
+            ExtTab.openWithContent(/** @type {string} */ (notification.data));
+          });
+        }
       });
     }
   }

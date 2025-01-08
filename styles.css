@@ -48,12 +48,16 @@ table {
   border-spacing: 0;
 }
 
-.spacer {
-  flex-grow: 1;
+.btn {
+  cursor: pointer;
 }
 
 .hidden {
   display: none;
+}
+
+.spacer {
+  flex-grow: 1;
 }
 
 .header-wrapper {
@@ -149,6 +153,7 @@ h1 {
   background-color: var(--success);
 }
 
-.btn {
-  cursor: pointer;
+.actions {
+  display: flex;
+  gap: 0.25rem;
 }
