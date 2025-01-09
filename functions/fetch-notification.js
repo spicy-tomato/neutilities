@@ -5,6 +5,7 @@ import { ExtMessage } from '../shared/message.js';
 import { ListStorage } from '../shared/storage/list.storage.js';
 import { PinStorage } from '../shared/storage/pin.storage.js';
 import { ExtTab } from '../shared/tab.js';
+import { NotificationMinifier } from './minify-notification.js';
 
 export class NeuNotification {
   /**
@@ -178,7 +179,11 @@ export class NeuNotification {
           HtmlHelper.display(offlineBtn);
 
           offlineBtn.addEventListener('click', () => {
-            ExtTab.openWithContent(/** @type {string} */ (notification.data));
+            ExtTab.openWithContent(
+              NotificationMinifier.unminify(
+                /** @type {string} */ (notification.data)
+              )
+            );
           });
         }
       });

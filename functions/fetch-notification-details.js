@@ -1,4 +1,5 @@
 import { SCHOOL_SITE } from '../shared/const.js';
+import { NotificationMinifier } from './minify-notification.js';
 
 export class NotificationDetailsFetcher {
   /**
@@ -15,7 +16,7 @@ export class NotificationDetailsFetcher {
         return null;
       }
 
-      const html = NotificationDetailsFetcher.#minify(htmlElement.getHTML());
+      const html = NotificationMinifier.minify(htmlElement.getHTML());
       return html;
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -41,26 +42,5 @@ export class NotificationDetailsFetcher {
     const domNotificationElement = doc.querySelector('.divmain');
 
     return domNotificationElement;
-  }
-
-  /**
-   * Retrieve notification DOM
-   * @param {string} html
-   * @returns {string}
-   */
-  static #minify(html) {
-    // Remove comments
-    html = html.replace(/<!--[\s\S]*?-->/g, '');
-
-    // Remove unnecessary whitespace
-    html = html
-      .replace(/\s{2,}/g, ' ')
-      .replace(/>\s+</g, '><')
-      .trim();
-
-    // Remove empty tags
-    html = html.replace(/<(\w+)([^>]*)>\s*<\/\1>/g, '');
-
-    return html;
   }
 }

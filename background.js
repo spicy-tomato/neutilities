@@ -1,4 +1,5 @@
 import { NotificationFetcher } from './functions/fetch-notification.js';
+import { NotificationMinifier } from './functions/minify-notification.js';
 import { ExtAlarm } from './shared/alarm.js';
 import { ExtBadge } from './shared/badge.js';
 import { NotificationDb } from './shared/db/notification.db.js';
@@ -80,7 +81,10 @@ async function handleCheckRecentlyUpdateNotificationJob() {
       url
     );
     if (!!data) {
-      crawledNotifications.push({ url, data });
+      crawledNotifications.push({
+        url,
+        data: NotificationMinifier.minify(data),
+      });
     }
   }
 
@@ -160,9 +164,10 @@ Promise.all([
 ]).then(() => alarm.listen());
 
 chrome.runtime.onInstalled.addListener(async (details) => {
-  if (details.reason !== 'install') {
+  if (details.reason !== chrome.runtime.OnInstalledReason.INSTALL) {
     await new StorageHelper().clean('extension');
   }
+
   try {
     await handleCheckNewNotificationJob();
   } catch (_) {
