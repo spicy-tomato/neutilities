@@ -65,7 +65,7 @@ export class Db {
         const oldVersion = event.oldVersion || 0; // Old version or 0 if no version exists
         const newVersion = event.newVersion || this.version;
 
-        console.log(
+        console.info(
           `Upgrading database from version ${oldVersion} to ${newVersion}`
         );
 

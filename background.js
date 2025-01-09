@@ -9,6 +9,30 @@ import { StorageHelper } from './shared/storage/storage.helper.js';
 
 const UPDATE_NOTIFICATION_BATCH = 5;
 
+async function listen() {
+  await ExtAlarm.removeUnused();
+
+  await Promise.all([
+    ExtAlarm.add(
+      'CHECK_NEW_NOTIFICATION_ALARM',
+      { periodInMinutes: 0.5 },
+      handleCheckNewNotificationJob
+    ),
+    ExtAlarm.add(
+      'CHECK_NEW_UPDATE_NOTIFICATION_ALARM',
+      { periodInMinutes: 0.5 },
+      handleCheckRecentlyUpdateNotificationJob
+    ),
+    ExtAlarm.add(
+      'PRUNE_NOTIFICATION_ALARM',
+      { periodInMinutes: 30 },
+      handlePruneNotificationJob
+    ),
+  ]);
+
+  ExtAlarm.listen();
+}
+
 // #region job handlers
 
 /**
@@ -143,25 +167,7 @@ ExtOffscreen.createDocument(
   'Fetching notifications from NEU homepage site'
 );
 
-const alarm = new ExtAlarm();
-
-Promise.all([
-  alarm.add(
-    'CHECK_NEW_NOTIFICATION_ALARM',
-    { periodInMinutes: 0.5 },
-    handleCheckNewNotificationJob
-  ),
-  alarm.add(
-    'CHECK_NEW_UPDATE_NOTIFICATION_ALARM',
-    { periodInMinutes: 0.5 },
-    handleCheckRecentlyUpdateNotificationJob
-  ),
-  alarm.add(
-    'PRUNE_NOTIFICATION_ALARM',
-    { periodInMinutes: 30 },
-    handlePruneNotificationJob
-  ),
-]).then(() => alarm.listen());
+listen();
 
 chrome.runtime.onInstalled.addListener(async (details) => {
   if (details.reason !== chrome.runtime.OnInstalledReason.INSTALL) {
