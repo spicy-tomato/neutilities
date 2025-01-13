@@ -132,6 +132,14 @@ async function handleCheckRecentlyUpdateNotificationJob() {
       await notificationDb.patch(crawledNotification.url, {
         lastUpdatedAt: new Date().toISOString(),
       });
+    } else if (
+      NotificationMinifier.minify(savedNotification.data) ===
+      crawledNotification.data
+    ) {
+      await notificationDb.patch(crawledNotification.url, {
+        data: crawledNotification.data,
+        lastUpdatedAt: new Date().toISOString(),
+      });
     } else {
       await notificationDb.patch(crawledNotification.url, {
         data: crawledNotification.data,
