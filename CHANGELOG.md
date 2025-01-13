@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.7.1](https://github.com/spicy-tomato/neutilities/compare/v1.7.0...v1.7.1) (2025-01-13)
+
+
+### Bug Fixes
+
+* deprecated alarms should be removed ([6da94e6](https://github.com/spicy-tomato/neutilities/commit/6da94e670c091312bf380be778c58cdf5ae1b477))
+* tag `updated` should not be displayed after minify rule changes ([f152db6](https://github.com/spicy-tomato/neutilities/commit/f152db6c6727df491973a9fe6ad6a458ed3f0af2))
+
 ## [1.7.0](https://github.com/spicy-tomato/neutilities/compare/v1.6.0...v1.7.0) (2025-01-08)
 
 
