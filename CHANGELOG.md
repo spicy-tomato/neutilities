@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.8.0](https://github.com/spicy-tomato/neutilities/compare/v1.7.1...v1.8.0) (2025-04-26)
+
+
+### Features
+
+* do not fetch data if no internet connection found ([c4e4f8f](https://github.com/spicy-tomato/neutilities/commit/c4e4f8f612b19bf98965b451a6842120c3f7e352))
+* only clean storage when updating new version of extension ([70ff775](https://github.com/spicy-tomato/neutilities/commit/70ff7757ad5481043149459834692b5717e3ab2c))
+
 ## [1.7.1](https://github.com/spicy-tomato/neutilities/compare/v1.7.0...v1.7.1) (2025-01-13)
 
 
