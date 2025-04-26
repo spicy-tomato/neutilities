@@ -8,6 +8,11 @@ export class NotificationDetailsFetcher {
    * @returns {Promise.<string | null>}
    */
   async fetchAndMinify(url) {
+    if (!navigator.onLine) {
+      console.info('No internet connection! Skip fetching data');
+      return null;
+    }
+
     try {
       const htmlElement =
         await NotificationDetailsFetcher.#retrieveNotificationDom(url);

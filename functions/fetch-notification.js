@@ -270,6 +270,10 @@ export class NotificationFetcher {
   async fetch(isRunFromBackground = false) {
     try {
       const domNotificationElements = await this.#retrieveNotificationsDom();
+      if (!domNotificationElements) {
+        return;
+      }
+
       this.#notifications = await NeuNotification.getListFromNodeList(
         domNotificationElements,
         isRunFromBackground
@@ -388,9 +392,14 @@ export class NotificationFetcher {
 
   /**
    * Retrieve notifications DOM
-   * @returns {Promise.<NodeListOf<Element>>}
+   * @returns {Promise.<NodeListOf<Element> | null>}
    */
   async #retrieveNotificationsDom() {
+    if (!navigator.onLine) {
+      console.info('No internet connection! Skip fetching data');
+      return null;
+    }
+
     const response = await fetch(SCHOOL_SITE);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
