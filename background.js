@@ -178,7 +178,7 @@ ExtOffscreen.createDocument(
 listen();
 
 chrome.runtime.onInstalled.addListener(async (details) => {
-  if (details.reason !== chrome.runtime.OnInstalledReason.INSTALL) {
+  if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
     await new StorageHelper().clean('extension');
   }
 
