@@ -6,6 +6,7 @@
   "permissions": [
     "alarms",
     "offscreen",
+    "scripting",
     "storage"
   ],
   "host_permissions": [
@@ -14,6 +15,14 @@
   "action": {
     "default_popup": "popup.html"
   },
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "matches": [
+        "https://daihocchinhquy.neu.edu.vn/Home/Marks"
+      ]
+    }
+  ],
   "background": {
     "service_worker": "background.js",
     "type": "module"
